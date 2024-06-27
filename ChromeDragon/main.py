@@ -1,7 +1,8 @@
-import sys, random
+import random
 
 import pygame
 from pygame.color import THECOLORS as COLORS
+import cv2
 
 
 def draw_background():
@@ -84,6 +85,11 @@ def check_dead():
     return False
 
 
+def get_state(image_name):
+    image = pygame.surfarray.array3d(pygame.display.get_surface())
+    cv2.imwrite(image_name, image.transpose((1, 0, 2)))
+
+
 if __name__ == "__main__":
     # init pygame
     pygame.init()
@@ -115,7 +121,7 @@ if __name__ == "__main__":
 
     # main loop
     running = True
-    pause = False
+
     jump = False
     lookdown = False
     dead = False
@@ -125,7 +131,7 @@ if __name__ == "__main__":
                 running = False
                 break
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                pause = not pause
+                print("Mouse Down !!!")
             elif event.type == pygame.KEYUP:
                 if chr(event.key) == 'w':
                     if jump_times > 0:
@@ -135,7 +141,7 @@ if __name__ == "__main__":
                     lookdown = True
 
         # update data
-        if not pause and not dead:
+        if not dead:
             level = count_time / 10 + 1
             count_time += frame / level
             cactus_list = [[x[0] - speed, x[1]] if x[0] - speed > -200 else [2200, random.choice([1, 2])] for x in
@@ -149,10 +155,9 @@ if __name__ == "__main__":
                 dragon_v = JUMP_V
                 jump = False
             dragon_y = dragon_y + frame * dragon_v if dragon_y + frame * dragon_v < (FLOOR_Y - dragon_height) else (
-                        FLOOR_Y - dragon_height)
+                    FLOOR_Y - dragon_height)
             if dragon_y >= (FLOOR_Y - dragon_height):
                 jump_times = 2
-
         # background
         draw_background()
         # anamy
@@ -160,14 +165,7 @@ if __name__ == "__main__":
         draw_raven()
         # choose item
         draw_dragon()
-        # point
-        draw_context()
-        # pause
-        if not dead and pause:
-            draw_pause()
-        # dead
-        if dead:
-            draw_dead()
+
         # flip
         pygame.display.flip()
 
