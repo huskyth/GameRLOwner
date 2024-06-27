@@ -122,6 +122,8 @@ if __name__ == "__main__":
     # main loop
     running = True
 
+    will_step = True
+
     jump = False
     lookdown = False
     dead = False
@@ -131,7 +133,7 @@ if __name__ == "__main__":
                 running = False
                 break
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                print("Mouse Down !!!")
+                will_step = True
             elif event.type == pygame.KEYUP:
                 if chr(event.key) == 'w':
                     if jump_times > 0:
@@ -140,6 +142,10 @@ if __name__ == "__main__":
                 elif chr(event.key) == 's':
                     lookdown = True
 
+        if not will_step:
+            continue
+        else:
+            will_step = False
         # update data
         if not dead:
             level = count_time / 10 + 1
