@@ -26,30 +26,6 @@ def draw_raven():
         pygame.draw.rect(screen, COLORS['black'], (x[0], 800 - x[1] * 50, 100, 20), 0)
 
 
-def draw_context():
-    txt = font50.render('Count time: ' + str(int(count_time)) + ' S', True, COLORS['black'])
-    x, y = 10, 920
-    screen.blit(txt, (x, y))
-
-
-def draw_pause():
-    s = pygame.Surface(SIZE, pygame.SRCALPHA)
-    s.fill((255, 255, 255, 220))
-    screen.blit(s, (0, 0))
-    txt = font120.render('PAUSE', True, COLORS['darkgray'])
-    x, y = 550, 400
-    screen.blit(txt, (x, y))
-
-
-def draw_dead():
-    s = pygame.Surface(SIZE, pygame.SRCALPHA)
-    s.fill((255, 255, 255, 240))
-    screen.blit(s, (0, 0))
-    txt = font120.render('YOU DEAD', True, COLORS['black'])
-    x, y = 450, 400
-    screen.blit(txt, (x, y))
-
-
 def rect_cover(rect1, rect2, up=True):
     # dragon
     left_up1 = (rect1[0], rect1[1])
@@ -96,8 +72,6 @@ if __name__ == "__main__":
 
     # contant
     SIZE = [1500, 1000]
-    font50 = pygame.font.SysFont('Times', 50)
-    font120 = pygame.font.SysFont('Times', 120)
     G = 9.8 * 30  # g
     JUMP_V = -300
     FLOOR_Y = 800
