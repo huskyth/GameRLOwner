@@ -3,6 +3,8 @@ import random
 import pygame
 from pygame.color import THECOLORS as COLORS
 
+from ChromeDragon.tools import rect_cover
+
 
 class DragonEnvironment:
     FRAME = 0.02
@@ -20,12 +22,37 @@ class DragonEnvironment:
         self.dragon_x, self.dragon_y, self.dragon_v = None, None, None
         self.raven_list, self.cactus_list = None, None
         self.screen = None
-        self.reset_param()
+        self._reset_param()
+
+    def _check_dead(self):
+        dragon_rect = (self.dragon_x, self.dragon_y, DragonEnvironment.DRAGON_WIDTH, DragonEnvironment.DRAGON_HEIGHT)
+        if dragon_rect[1] + dragon_rect[3] > 900:
+            return True
+        for x in self.cactus_list:
+            down_rect = (x[0], 730, x[1] * 40, 100)
+            if rect_cover(dragon_rect, down_rect, up=False):
+                return True
+        for x in self.raven_list:
+            down_rect = (x[0], 800 - x[1] * 50, 100, 20)
+            if rect_cover(dragon_rect, down_rect, up=False):
+                return True
+        return False
+
+    def _jump_data_update(self):
+        if self.jump_times > 0:
+            self.jump_times -= 1
+            self.is_jump = True
 
     def step(self, action):
-        pass
+        assert action in [False, True]
+        if action is True:
+            self._jump_data_update()
 
-    def reset_param(self):
+        self._data_update_once()
+        self._draw_once()
+        self.is_dead = self._check_dead()
+
+    def _reset_param(self):
         self.is_dead = False
         self.is_jump = False
         self.jump_times = 2
@@ -35,7 +62,7 @@ class DragonEnvironment:
         self.raven_list = [[700, 1], [1700, 2]]
         self.cactus_list = [[500, 2], [1000, 1], [1500, 1], [2000, 2]]
 
-    def game_init(self):
+    def _game_init(self):
         pygame.init()
         self.screen = pygame.display.set_mode(DragonEnvironment.SIZE)
 
@@ -68,8 +95,8 @@ class DragonEnvironment:
                 self.jump_times = 2
 
     def reset(self):
-        self.reset_param()
-        self.game_init()
+        self._reset_param()
+        self._game_init()
         self._draw_once()
 
     def _draw_background(self):
@@ -103,3 +130,20 @@ class DragonEnvironment:
         self._draw_dragon()
         # flip
         pygame.display.flip()
+
+
+def is_quit():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            return True
+    return False
+
+
+if __name__ == '__main__':
+    de = DragonEnvironment()
+    de.reset()
+    while True:
+        if is_quit():
+            break
+        de.step(False)
+        pygame.time.delay(10)
