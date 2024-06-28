@@ -1,6 +1,7 @@
 import random
 
 import pygame
+from pygame.color import THECOLORS as COLORS
 
 
 class DragonEnvironment:
@@ -69,3 +70,36 @@ class DragonEnvironment:
     def reset(self):
         self.reset_param()
         self.game_init()
+        self._draw_once()
+
+    def _draw_background(self):
+        # white background
+        self.screen.fill(COLORS['lightblue'])
+        pygame.draw.rect(self.screen, COLORS['black'], (-100, 902, 3000, 200), 5)
+        pygame.draw.rect(self.screen, COLORS['darkgray'], (-100, 802, 3000, 100), 0)
+
+    def _draw_cactus(self):
+        for x in self.cactus_list:
+            pygame.draw.rect(self.screen, COLORS['darkgreen'], (x[0], 730, 40 * x[1], 100), 0)
+
+    def _draw_raven(self):
+        for x in self.raven_list:
+            pygame.draw.rect(self.screen, COLORS['black'], (x[0], 800 - x[1] * 50, 100, 20), 0)
+
+    def _draw_dragon(self):
+        pygame.draw.rect(self.screen, COLORS['darkred'], (
+            self.dragon_x, self.dragon_y, DragonEnvironment.DRAGON_WIDTH, DragonEnvironment.DRAGON_HEIGHT), 0)
+
+    def _quit(self):
+        pygame.quit()
+
+    def _draw_once(self):
+        # background
+        self._draw_background()
+        # anamy
+        self._draw_cactus()
+        self._draw_raven()
+        # choose item
+        self._draw_dragon()
+        # flip
+        pygame.display.flip()
