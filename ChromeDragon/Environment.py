@@ -1,6 +1,6 @@
 class DragonEnvironment:
     def __init__(self):
-        pass
+        self.is_dead = False
 
     def step(self, action):
         pass

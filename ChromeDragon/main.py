@@ -99,7 +99,6 @@ if __name__ == "__main__":
     will_step = True
 
     jump = False
-    lookdown = False
     dead = False
     while running:
         for event in pygame.event.get():
@@ -113,8 +112,6 @@ if __name__ == "__main__":
                     if jump_times > 0:
                         jump_times -= 1
                         jump = True
-                elif chr(event.key) == 's':
-                    lookdown = True
 
         if not will_step:
             continue
