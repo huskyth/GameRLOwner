@@ -38,7 +38,7 @@ def rect_cover(rect1, rect2, up=True):
     right_up2 = (left_up2[0] + rect2[2], rect2[1])
     right_down2 = (left_up2[0] + rect2[2], left_up2[1] + rect2[3])
     # check
-    if (left_up2[0] <= right_up1[0] <= right_up2[0]):  # x,肯定是右侧线接触，因此判断dragon的right即可
+    if left_up2[0] <= right_up1[0] <= right_up2[0]:  # x,肯定是右侧线接触，因此判断dragon的right即可
         if up and (left_up2[1] <= right_up1[1] <= left_down2[1]):
             return True
         elif (not up) and (left_up2[1] <= right_down1[1] <= left_down2[1]):
