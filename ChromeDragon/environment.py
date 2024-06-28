@@ -1,5 +1,7 @@
 import random
+import time
 
+import cv2
 import pygame
 from pygame.color import THECOLORS as COLORS
 
@@ -51,6 +53,7 @@ class DragonEnvironment:
         self._data_update_once()
         self._draw_once()
         self.is_dead = self._check_dead()
+        return self._get_state(), self.is_dead
 
     def _reset_param(self):
         self.is_dead = False
@@ -61,6 +64,9 @@ class DragonEnvironment:
         self.dragon_v = 0
         self.raven_list = [[700, 1], [1700, 2]]
         self.cactus_list = [[500, 2], [1000, 1], [1500, 1], [2000, 2]]
+
+    def _get_state(self):
+        return pygame.surfarray.array3d(pygame.display.get_surface()).transpose((1, 0, 2))
 
     def _game_init(self):
         pygame.init()
@@ -98,6 +104,7 @@ class DragonEnvironment:
         self._reset_param()
         self._game_init()
         self._draw_once()
+        return self._get_state(), False
 
     def _draw_background(self):
         # white background
@@ -141,9 +148,17 @@ def is_quit():
 
 if __name__ == '__main__':
     de = DragonEnvironment()
-    de.reset()
+    i = 0
+    temp, is_terminate = de.reset()
+    cv2.imwrite(f"step_{i}_{is_terminate}.png", temp)
     while True:
-        if is_quit():
-            break
-        de.step(False)
+        if is_quit() or is_terminate:
+            time.sleep(10)
+            print("reset ")
+            _, is_terminate = de.reset()
+            continue
+        temp, is_terminate = de.step(False)
+        i += 1
+        cv2.imwrite(f"step_{i}_{is_terminate}.png", temp)
+
         pygame.time.delay(10)
