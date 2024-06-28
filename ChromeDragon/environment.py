@@ -150,7 +150,6 @@ if __name__ == '__main__':
     de = DragonEnvironment()
     i = 0
     temp, is_terminate = de.reset()
-    cv2.imwrite(f"step_{i}_{is_terminate}.png", temp)
     while True:
         if is_quit() or is_terminate:
             time.sleep(10)
@@ -159,6 +158,5 @@ if __name__ == '__main__':
             continue
         temp, is_terminate = de.step(False)
         i += 1
-        cv2.imwrite(f"step_{i}_{is_terminate}.png", temp)
 
         pygame.time.delay(10)
