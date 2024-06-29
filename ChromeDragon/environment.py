@@ -53,7 +53,8 @@ class DragonEnvironment:
         self._data_update_once()
         self._draw_once()
         self.is_dead = self._check_dead()
-        return self._get_state(), self.is_dead
+        reward = 0.1 if not self.is_dead else -1
+        return self._get_state(), reward, self.is_dead
 
     def _reset_param(self):
         self.is_dead = False
