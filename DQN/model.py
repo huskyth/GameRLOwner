@@ -50,7 +50,7 @@ class DragonModel(nn.Module):
 
 if __name__ == '__main__':
     print(torch.cuda.is_available())
-    dm = DragonModel()
-    image = torch.zeros((1500, 1000, 3)).permute(2, 0, 1).unsqueeze(0)
+    dm = DragonModel().cuda()
+    image = torch.zeros((1500, 1000, 3)).permute(2, 0, 1).unsqueeze(0).cuda()
     y = dm(image)
     print(y, y.shape)
