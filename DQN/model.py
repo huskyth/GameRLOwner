@@ -10,7 +10,7 @@ class Reshape(nn.Module):
         self.shape = args
 
     def forward(self, x):
-        return x.view((x.size(0),) + self.shape)
+        return x.reshape((x.size(0),) + self.shape)
 
 
 class DragonModel(nn.Module):
@@ -44,6 +44,9 @@ class DragonModel(nn.Module):
         )
 
     def forward(self, x):
+        assert len(x.shape) == 4
+        if x.shape[3] == 3:
+            x = x.permute(0, 3, 1, 2)
         x = self.feature(x)
         return x
 
