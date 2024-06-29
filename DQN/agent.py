@@ -25,6 +25,16 @@ class DragonAgent:
         action = torch.argmax(action, dim=-1)
         return action.detach().cpu().item()
 
+    def save(self):
+        saved = {"model_state_dict": self.q_net.state_dict(), "optimizer_state_dict": self.optimizer.state_dict()}
+        torch.save(saved, "best.pt")
+
+    def load(self):
+        saved = torch.load("best.pt")
+        self.q_net.load_state_dict(saved["model_state_dict"])
+        self.optimizer.load_state_dict(saved["optimizer_state_dict"])
+        print(self.q_net.state_dict()['feature.2.weight'][0][0])
+
     def update(self):
         state, action, reward, next_state = self.buffer.sample()
         state = torch.cat(state).cuda()
@@ -58,3 +68,5 @@ if __name__ == '__main__':
     buffer_.push((s3, action_test_2, 0, s4))
 
     da.update()
+
+    da.load()
