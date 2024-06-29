@@ -150,6 +150,7 @@ if __name__ == '__main__':
     de = DragonEnvironment()
     i = 0
     temp, is_terminate = de.reset()
+
     while True:
         if is_quit() or is_terminate:
             time.sleep(10)
