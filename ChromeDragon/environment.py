@@ -67,7 +67,7 @@ class DragonEnvironment:
         self.cactus_list = [[500, 2], [1000, 1], [1500, 1], [2000, 2]]
 
     def _get_state(self):
-        return pygame.surfarray.array3d(pygame.display.get_surface()).transpose((1, 0, 2))
+        return pygame.surfarray.array3d(pygame.display.get_surface())[None]
 
     def _game_init(self):
         pygame.init()

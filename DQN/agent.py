@@ -1,3 +1,4 @@
+import numpy
 import torch
 
 from DQN.buffer import DragonBuffer
@@ -21,6 +22,11 @@ class DragonAgent:
 
     @torch.no_grad()
     def get_action(self, state):
+        if isinstance(state, numpy.ndarray):
+            state = torch.from_numpy(state).float()
+        if len(state.shape) == 3:
+            state = state.unsqueeze(0)
+        state = state.cuda()
         action = self.q_net(state)
         action = torch.argmax(action, dim=-1)
         return action.detach().cpu().item()
@@ -37,9 +43,11 @@ class DragonAgent:
 
     def update(self):
         state, action, reward, next_state = self.buffer.sample()
+        state = [torch.from_numpy(x).float() for x in state]
         state = torch.cat(state).cuda()
         action = torch.tensor(action, dtype=torch.int64).cuda().unsqueeze(1)
         reward = torch.tensor(reward, dtype=torch.float32).cuda()
+        next_state = [torch.from_numpy(x).float() for x in next_state]
         next_state = torch.cat(next_state).cuda()
 
         q_value = self.q_net(state).gather(1, action)
