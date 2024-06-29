@@ -25,6 +25,7 @@ class DragonEnvironment:
         self.raven_list, self.cactus_list = None, None
         self.screen = None
         self._reset_param()
+        self._game_init()
 
     def _check_dead(self):
         dragon_rect = (self.dragon_x, self.dragon_y, DragonEnvironment.DRAGON_WIDTH, DragonEnvironment.DRAGON_HEIGHT)
@@ -53,7 +54,7 @@ class DragonEnvironment:
         self._data_update_once()
         self._draw_once()
         self.is_dead = self._check_dead()
-        reward = 0.1 if not self.is_dead else -1
+        reward = 0.01 if not self.is_dead else -1
         return self._get_state(), reward, self.is_dead
 
     def _reset_param(self):
@@ -103,7 +104,6 @@ class DragonEnvironment:
 
     def reset(self):
         self._reset_param()
-        self._game_init()
         self._draw_once()
         return self._get_state(), False
 

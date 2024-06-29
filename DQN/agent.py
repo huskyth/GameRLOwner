@@ -1,3 +1,5 @@
+import random
+
 import numpy
 import torch
 
@@ -10,7 +12,7 @@ class DragonAgent:
     def __init__(self, buffer):
         self.q_net = DragonModel().cuda()
         for key, model in self.q_net.named_parameters():
-            model.data.normal_(-0.8, 0.8)
+            model.data.normal_(-1, 1)
 
         self.target_q_net = DragonModel().cuda()
 
@@ -19,9 +21,10 @@ class DragonAgent:
         self.gamma = 0.99
 
         self.optimizer = torch.optim.Adam(self.q_net.parameters(), lr=1e-2)
+        self.action_probability = 0.7
 
     @torch.no_grad()
-    def get_action(self, state):
+    def _get_action(self, state):
         if isinstance(state, numpy.ndarray):
             state = torch.from_numpy(state).float()
         if len(state.shape) == 3:
@@ -30,6 +33,12 @@ class DragonAgent:
         action = self.q_net(state)
         action = torch.argmax(action, dim=-1)
         return action.detach().cpu().item()
+
+    def sample_action(self, state):
+        if random.uniform(0, 1) > self.action_probability:
+            return torch.randint(low=0, high=2, size=(1,)).item()
+        else:
+            return self._get_action(state)
 
     def save(self):
         saved = {"model_state_dict": self.q_net.state_dict(), "optimizer_state_dict": self.optimizer.state_dict()}
@@ -70,8 +79,8 @@ if __name__ == '__main__':
 
     buffer_ = DragonBuffer()
     da = DragonAgent(buffer_)
-    action_test = da.get_action(s1)
-    action_test_2 = da.get_action(s3)
+    action_test = da.sample_action(s1)
+    action_test_2 = da.sample_action(s3)
     buffer_.push((s1, action_test, 1, s2))
     buffer_.push((s3, action_test_2, 0, s4))
 
