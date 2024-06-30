@@ -52,18 +52,19 @@ class DragonAgent:
         print(self.q_net.state_dict()['feature.2.weight'][0][0])
 
     def update(self):
-        state, action, reward, next_state = self.buffer.sample()
+        state, action, reward, next_state, done = self.buffer.sample()
         state = [torch.from_numpy(x).float() for x in state]
         state = torch.cat(state).cuda()
         action = torch.tensor(action, dtype=torch.int64).cuda().unsqueeze(1)
         reward = torch.tensor(reward, dtype=torch.float32).cuda()
         next_state = [torch.from_numpy(x).float() for x in next_state]
         next_state = torch.cat(next_state).cuda()
+        done = torch.tensor(done).int().cuda()
 
         q_value = self.q_net(state).gather(1, action)
 
         next_action = torch.argmax(self.q_net(next_state), dim=-1).unsqueeze(1)
-        q_target = self.target_q_net(next_state).gather(1, next_action) + reward
+        q_target = (1 - done) * self.target_q_net(next_state).gather(1, next_action) + reward
 
         loss = F.mse_loss(q_target, q_value)
 

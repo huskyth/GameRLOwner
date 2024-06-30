@@ -17,12 +17,10 @@ def epoch_once(d_environment, d_agent, d_buffer):
     c = Counter()
     while step <= MAX_STEP and not is_terminate:
         step += 1
-        if is_terminate:
-            break
         pre_s = s
         action = d_agent.sample_action(pre_s)
         s, reward, is_terminate = d_environment.step(action)
-        d_buffer.push((pre_s, action, reward, s))
+        d_buffer.push((pre_s, action, reward, s, is_terminate))
         return_value += reward
         action_list += str(action) + ","
         reward_list += str(reward) + ","

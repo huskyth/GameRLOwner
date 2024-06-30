@@ -63,11 +63,21 @@ class DragonEnvironment:
         assert action in [0, 1]
         self.reward = 0
         if action == 1:
+            assert self.jump_times > 0
             self._jump_data_update()
 
-        self._data_update_once()
-        self._draw_once()
-        self.is_dead = self._check_dead()
+        if self.jump_times > 0:
+            self._data_update_once()
+            self._draw_once()
+            self.is_dead = self._check_dead()
+
+        while self.jump_times <= 0:
+            self._data_update_once()
+            self._draw_once()
+            self.is_dead = self._check_dead()
+            if self.is_dead is True:
+                break
+
         if self.is_dead:
             self.reward = -3
         return self._get_state(), self.reward, self.is_dead
@@ -119,6 +129,7 @@ class DragonEnvironment:
 
     def reset(self):
         self._reset_param()
+        self._data_update_once()
         self._draw_once()
         return self._get_state(), False
 
