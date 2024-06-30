@@ -24,6 +24,7 @@ class DragonEnvironment:
         self.dragon_x, self.dragon_y, self.dragon_v = None, None, None
         self.raven_list, self.cactus_list = None, None
         self.screen = None
+        self.reward = None
         self._reset_param()
         self._game_init()
 
@@ -41,21 +42,35 @@ class DragonEnvironment:
                 return True
         return False
 
+    def _check_go_through(self):
+        reward = 0
+        for x in self.cactus_list:
+            if self.dragon_y + DragonEnvironment.DRAGON_HEIGHT < 730 and (
+                    DragonEnvironment.DRAGON_WIDTH // 2 + self.dragon_x) == x[0] + 40 * x[1] // 2:
+                reward += 1
+        for x in self.raven_list:
+            if self.dragon_y + DragonEnvironment.DRAGON_HEIGHT < 800 - x[1] * 50 and (
+                    DragonEnvironment.DRAGON_WIDTH // 2 + self.dragon_x) == x[0] + 100 // 2:
+                reward += 1
+                self.reward = reward
+
     def _jump_data_update(self):
         if self.jump_times > 0:
             self.jump_times -= 1
             self.is_jump = True
 
     def step(self, action):
-        assert action in [False, True]
-        if action is True:
+        assert action in [0, 1]
+        self.reward = 0
+        if action == 1:
             self._jump_data_update()
 
         self._data_update_once()
         self._draw_once()
         self.is_dead = self._check_dead()
-        reward = 0.01 if not self.is_dead else -1
-        return self._get_state(), reward, self.is_dead
+        if self.is_dead:
+            self.reward = -3
+        return self._get_state(), self.reward, self.is_dead
 
     def _reset_param(self):
         self.is_dead = False

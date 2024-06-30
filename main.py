@@ -5,12 +5,16 @@ from DQN.model import DragonModel
 
 EPOCH = 100
 MAX_STEP = 100
+from collections import Counter
 
 
 def epoch_once(d_environment, d_agent, d_buffer):
     s, is_terminate = d_environment.reset()
     step = 0
     return_value = 0
+    action_list = ""
+    reward_list = ""
+    c = Counter()
     while step <= MAX_STEP and not is_terminate:
         step += 1
         if is_terminate:
@@ -20,9 +24,16 @@ def epoch_once(d_environment, d_agent, d_buffer):
         s, reward, is_terminate = d_environment.step(action)
         d_buffer.push((pre_s, action, reward, s))
         return_value += reward
+        action_list += str(action) + ","
+        reward_list += str(reward) + ","
+        c.update(str(action))
+
     d_agent.update()
     d_agent.save()
     print(f"return value: {return_value}")
+    print(f"reward_list: {reward_list}")
+    print(action_list)
+    print(c)
 
 
 if __name__ == '__main__':

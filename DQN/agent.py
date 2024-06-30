@@ -21,7 +21,8 @@ class DragonAgent:
         self.gamma = 0.99
 
         self.optimizer = torch.optim.Adam(self.q_net.parameters(), lr=1e-2)
-        self.action_probability = 0.7
+        self.action_probability = 0.57
+        self.count = 0
 
     @torch.no_grad()
     def _get_action(self, state):
@@ -69,6 +70,12 @@ class DragonAgent:
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
+        print(f"current update step {self.count}, loss = {loss}")
+        if self.count % 20 == 0:
+            print(f"load from q net {self.count}")
+            self.target_q_net.load_state_dict(self.q_net.state_dict())
+
+        self.count += 1
 
 
 if __name__ == '__main__':

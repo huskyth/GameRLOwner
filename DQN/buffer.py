@@ -6,7 +6,7 @@ class DragonBuffer:
     def __init__(self):
         self.buffer = deque(maxlen=100)
 
-    def sample(self, batch=4):
+    def sample(self, batch=16):
         batch = min(batch, len(self.buffer))
         return zip(*random.sample(self.buffer, batch))
 
