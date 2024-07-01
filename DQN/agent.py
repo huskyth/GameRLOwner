@@ -1,3 +1,4 @@
+import math
 import random
 
 import numpy
@@ -21,8 +22,12 @@ class DragonAgent:
         self.gamma = 0.99
 
         self.optimizer = torch.optim.Adam(self.q_net.parameters(), lr=1e-2)
-        self.action_probability = 0.57
+        self.epsilon = 0.8
         self.count = 0
+        self.sample_count = 0
+        self.epsilon_start = 0.95
+        self.epsilon_end = 0.01
+        self.epsilon_decay = 300
 
     @torch.no_grad()
     def _get_action(self, state):
@@ -32,7 +37,11 @@ class DragonAgent:
         return action.detach().cpu().item()
 
     def sample_action(self, state):
-        if random.uniform(0, 1) > self.action_probability:
+        self.sample_count += 1
+        # epsilon指数衰减
+        self.epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * math.exp(
+            -1. * self.sample_count / self.epsilon_decay)
+        if random.uniform(0, 1) < self.epsilon:
             return torch.randint(low=0, high=2, size=(1,)).item()
         else:
             return self._get_action(state)
@@ -49,13 +58,11 @@ class DragonAgent:
 
     def update(self):
         state, action, reward, next_state, done = self.buffer.sample()
-        state = [torch.from_numpy(x).float() for x in state]
         state = torch.cat(state).cuda()
         action = torch.tensor(action, dtype=torch.int64).cuda().unsqueeze(1)
-        reward = torch.tensor(reward, dtype=torch.float32).cuda()
-        next_state = [torch.from_numpy(x).float() for x in next_state]
+        reward = torch.tensor(reward, dtype=torch.float32).unsqueeze(1).cuda()
         next_state = torch.cat(next_state).cuda()
-        done = torch.tensor(done).int().cuda()
+        done = torch.tensor(done).int().unsqueeze(1).cuda()
 
         q_value = self.q_net(state).gather(1, action)
 
