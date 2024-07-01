@@ -18,7 +18,7 @@ class DragonModel(nn.Module):
         super().__init__()
         self.const_channel = 64
         self.feature = nn.Sequential(
-            nn.Conv2d(3, self.const_channel, 5, 2),
+            nn.Conv2d(4, self.const_channel, 5, 2),
             nn.ReLU(),
             nn.Conv2d(self.const_channel, self.const_channel, 3, 2),
             nn.ReLU(),
@@ -44,9 +44,6 @@ class DragonModel(nn.Module):
         )
 
     def forward(self, x):
-        assert len(x.shape) == 4
-        if x.shape[3] == 3:
-            x = x.permute(0, 3, 1, 2)
         x = self.feature(x)
         return x
 
@@ -54,6 +51,6 @@ class DragonModel(nn.Module):
 if __name__ == '__main__':
     print(torch.cuda.is_available())
     dm = DragonModel().cuda()
-    image = torch.zeros((1500, 1000, 3)).permute(2, 0, 1).unsqueeze(0).cuda()
+    image = torch.zeros((1500, 1000, 4)).permute(2, 0, 1).unsqueeze(0).cuda()
     y = dm(image)
     print(y, y.shape)

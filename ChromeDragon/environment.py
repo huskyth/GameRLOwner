@@ -3,9 +3,11 @@ import time
 
 import cv2
 import pygame
+import torch
 from pygame.color import THECOLORS as COLORS
 
 from ChromeDragon.tools import rect_cover
+import numpy as np
 
 
 class DragonEnvironment:
@@ -93,7 +95,14 @@ class DragonEnvironment:
         self.cactus_list = [[500, 2], [1000, 1], [1500, 1], [2000, 2]]
 
     def _get_state(self):
-        return pygame.surfarray.array3d(pygame.display.get_surface())[None]
+        raw_state = pygame.surfarray.array3d(pygame.display.get_surface())
+        jump_times = torch.ones((*raw_state.shape[:2], 1)) * self.jump_times
+        concatenated_state = np.concatenate((raw_state, jump_times), axis=-1)
+        state = torch.from_numpy(concatenated_state[None]).float()
+        assert len(state.shape) == 4
+        if state.shape[3] == 4:
+            state = state.permute(0, 3, 1, 2)
+        return state
 
     def _game_init(self):
         pygame.init()

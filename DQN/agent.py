@@ -26,10 +26,6 @@ class DragonAgent:
 
     @torch.no_grad()
     def _get_action(self, state):
-        if isinstance(state, numpy.ndarray):
-            state = torch.from_numpy(state).float()
-        if len(state.shape) == 3:
-            state = state.unsqueeze(0)
         state = state.cuda()
         action = self.q_net(state)
         action = torch.argmax(action, dim=-1)
