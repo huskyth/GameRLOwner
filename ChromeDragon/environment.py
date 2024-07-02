@@ -63,7 +63,8 @@ class DragonEnvironment:
 
     def step(self, action):
         assert action in [0, 1]
-        self.reward = 0
+        self.reward = 1
+        number_of_go_through = 0
         if action == 1:
             assert self.jump_times > 0
             self._jump_data_update()
@@ -79,9 +80,9 @@ class DragonEnvironment:
             self.is_dead = self._check_dead()
             if self.is_dead is True:
                 break
-
         if self.is_dead:
             self.reward = -3
+
         return self._get_state(), self.reward, self.is_dead
 
     def _reset_param(self):
@@ -96,6 +97,7 @@ class DragonEnvironment:
 
     def _get_state(self):
         raw_state = pygame.surfarray.array3d(pygame.display.get_surface())
+        raw_state = (raw_state - raw_state.min()) / (raw_state.max() - raw_state.min())
         jump_times = torch.ones((*raw_state.shape[:2], 1)) * self.jump_times
         concatenated_state = np.concatenate((raw_state, jump_times), axis=-1)
         state = torch.from_numpy(concatenated_state[None]).float()
@@ -109,21 +111,24 @@ class DragonEnvironment:
         self.screen = pygame.display.set_mode(DragonEnvironment.SIZE)
 
     def _data_update_once(self):
+        number_of_go_through = 0
         if not self.is_dead:
-            self.cactus_list = [
-                [x[0] - DragonEnvironment.SPEED, x[1]] if x[0] - DragonEnvironment.SPEED > -200 else [2200,
-                                                                                                      random.choice(
-                                                                                                          [1,
-                                                                                                           2])]
-                for x in
-                self.cactus_list]
-            self.raven_list = [
-                [x[0] - DragonEnvironment.SPEED, x[1]] if x[0] - DragonEnvironment.SPEED > -200 else [2200,
-                                                                                                      random.choice(
-                                                                                                          [1,
-                                                                                                           2])]
-                for x in
-                self.raven_list]
+            for x in self.cactus_list:
+                if x[0] - DragonEnvironment.SPEED > -200:
+                    cactus_center = x[0] + 40 * x[1] // 2
+                    if 0 >= self.dragon_x + DragonEnvironment.DRAGON_WIDTH // 2 - cactus_center >= - DragonEnvironment.SPEED:
+                        number_of_go_through += 1
+                    x[0], x[1] = x[0] - DragonEnvironment.SPEED, x[1]
+                else:
+                    x[0], x[1] = 2200, random.choice([1, 2])
+            for x in self.raven_list:
+                if x[0] - DragonEnvironment.SPEED > -200:
+                    raven_center = x[0] + 100 // 2
+                    if 0 >= self.dragon_x + DragonEnvironment.DRAGON_WIDTH // 2 - raven_center >= - DragonEnvironment.SPEED:
+                        number_of_go_through += 1
+                    x[0], x[1] = x[0] - DragonEnvironment.SPEED, x[1]
+                else:
+                    x[0], x[1] = 2200, random.choice([1, 2])
 
             if not self.is_jump:
                 self.dragon_v += DragonEnvironment.G * DragonEnvironment.FRAME
@@ -135,6 +140,7 @@ class DragonEnvironment:
                     DragonEnvironment.FLOOR_Y - DragonEnvironment.DRAGON_HEIGHT)
             if self.dragon_y >= (DragonEnvironment.FLOOR_Y - DragonEnvironment.DRAGON_HEIGHT):
                 self.jump_times = 2
+        return number_of_go_through
 
     def reset(self):
         self._reset_param()

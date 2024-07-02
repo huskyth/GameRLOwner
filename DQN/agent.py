@@ -10,7 +10,7 @@ import torch.nn.functional as F
 
 
 class DragonAgent:
-    def __init__(self, buffer):
+    def __init__(self, buffer, my_summary):
         self.q_net = DragonModel().cuda()
         for key, model in self.q_net.named_parameters():
             model.data.normal_(-1, 1)
@@ -27,7 +27,8 @@ class DragonAgent:
         self.sample_count = 0
         self.epsilon_start = 0.95
         self.epsilon_end = 0.01
-        self.epsilon_decay = 300
+        self.epsilon_decay = 350
+        self.my_summary = my_summary
 
     @torch.no_grad()
     def _get_action(self, state):
@@ -36,11 +37,14 @@ class DragonAgent:
         action = torch.argmax(action, dim=-1)
         return action.detach().cpu().item()
 
-    def sample_action(self, state):
+    def sample_action(self, state, is_test):
         self.sample_count += 1
+        if is_test:
+            return self._get_action(state)
         # epsilon指数衰减
         self.epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * math.exp(
             -1. * self.sample_count / self.epsilon_decay)
+        self.my_summary.add_float(x=0, y=self.epsilon, title="Epsilon")
         if random.uniform(0, 1) < self.epsilon:
             return torch.randint(low=0, high=2, size=(1,)).item()
         else:
@@ -67,10 +71,11 @@ class DragonAgent:
         q_value = self.q_net(state).gather(1, action)
 
         next_action = torch.argmax(self.q_net(next_state), dim=-1).unsqueeze(1)
-        q_target = (1 - done) * self.target_q_net(next_state).gather(1, next_action) + reward
+        q_target = self.gamma * (1 - done) * self.target_q_net(next_state).gather(1, next_action) + reward
 
         loss = F.mse_loss(q_target, q_value)
 
+        self.my_summary.add_float(x=0, y=loss.item(), title="Loss")
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
