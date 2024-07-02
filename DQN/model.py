@@ -3,6 +3,8 @@ import torch.nn as nn
 
 import torch
 
+from DQN.constants import SEQUENCE_LENGTH, BATCH_SIZE
+
 
 class Reshape(nn.Module):
     def __init__(self, *args):
@@ -17,7 +19,7 @@ class DragonModel(nn.Module):
     def __init__(self):
         super().__init__()
         self.const_channel = 64
-        self.feature = nn.Sequential(
+        self.common_feature = nn.Sequential(
             nn.Conv2d(4, self.const_channel, 5, 2),
             nn.ReLU(),
             nn.Conv2d(self.const_channel, self.const_channel, 3, 2),
@@ -39,18 +41,45 @@ class DragonModel(nn.Module):
             Reshape(self.const_channel * 6),
             nn.Linear(self.const_channel * 6, self.const_channel),
             nn.ReLU(),
+        )
+        self.action_feature = nn.Sequential(
             nn.Linear(self.const_channel, 2),
             nn.Softmax(),
         )
+        self.rnn_feature = nn.RNN(self.const_channel, self.const_channel, 1, batch_first=True)
 
     def forward(self, x):
-        x = self.feature(x)
-        return x
+        x = self.common_feature(x)
+        x = x.view(BATCH_SIZE, -1, self.const_channel)
+        steps = x.size(1)
+        q_list = []
+        hidden_list = []
+        for i in range(steps):
+            output, hidden = self.rnn_feature(x[:, i, :])
+            q_sa = self.action_feature(output.unsqueeze(1))
+            hidden_list.append(hidden)
+            q_list.append(q_sa)
+        return torch.cat(q_list, dim=1), torch.cat(hidden_list).detach()
+
+    @torch.no_grad()
+    def step(self, x):
+        assert x.size(0) == 1
+        x = self.common_feature(x).unsqueeze(1)
+        x, _ = self.rnn_feature(x)
+        return self.action_feature(x).squeeze(0)
 
 
 if __name__ == '__main__':
     print(torch.cuda.is_available())
     dm = DragonModel().cuda()
     image = torch.zeros((1500, 1000, 4)).permute(2, 0, 1).unsqueeze(0).cuda()
+    image_single = image
+    image_list = []
+    for _ in range(BATCH_SIZE * SEQUENCE_LENGTH):
+        image_list.append(image)
+
+    image = torch.cat(image_list, dim=0)
+
     y = dm(image)
-    print(y, y.shape)
+
+    dm.step(image_single)
