@@ -48,25 +48,20 @@ class DragonModel(nn.Module):
         )
         self.rnn_feature = nn.RNN(self.const_channel, self.const_channel, 1, batch_first=True)
 
-    def forward(self, x):
+    def forward(self, x, hidden=None):
         x = self.common_feature(x)
         x = x.view(BATCH_SIZE, -1, self.const_channel)
-        steps = x.size(1)
-        q_list = []
-        hidden_list = []
-        for i in range(steps):
-            output, hidden = self.rnn_feature(x[:, i, :])
-            q_sa = self.action_feature(output.unsqueeze(1))
-            hidden_list.append(hidden)
-            q_list.append(q_sa)
-        return torch.cat(q_list, dim=1), torch.cat(hidden_list).detach()
+
+        output, hidden = self.rnn_feature(x, hidden)
+        q_sa = self.action_feature(output)
+        return q_sa, hidden.detach()
 
     @torch.no_grad()
-    def step(self, x):
+    def step(self, x, hidden=None):
         assert x.size(0) == 1
         x = self.common_feature(x).unsqueeze(1)
-        x, _ = self.rnn_feature(x)
-        return self.action_feature(x).squeeze(0)
+        x, hidden = self.rnn_feature(x, hidden)
+        return self.action_feature(x).squeeze(0), hidden
 
 
 if __name__ == '__main__':
