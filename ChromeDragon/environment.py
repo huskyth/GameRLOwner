@@ -1,6 +1,7 @@
 import random
 import time
 
+import cv2
 import pygame
 import torch
 from pygame.color import THECOLORS as COLORS
@@ -55,6 +56,7 @@ class DragonEnvironment:
             self.is_jump = True
 
     def step(self, action):
+        assert isinstance(action, int)
         assert action in [0, 1]
         self.reward = 1
         if action == 1:
@@ -66,7 +68,6 @@ class DragonEnvironment:
             count += 1
 
         self.is_dead = self._check_dead()
-
         if self.is_dead:
             self.reward = -3
 
@@ -85,6 +86,7 @@ class DragonEnvironment:
 
     def _get_state(self):
         raw_state = pygame.surfarray.array3d(pygame.display.get_surface())
+        raw_state = cv2.resize(raw_state, (SIZE[0] // 2, SIZE[1] // 2), interpolation=cv2.INTER_AREA)
         raw_state = (raw_state - raw_state.min()) / (raw_state.max() - raw_state.min())
         jump_times = torch.ones((*raw_state.shape[:2], 1)) * self.jump_times
         concatenated_state = np.concatenate((raw_state, jump_times), axis=-1)
@@ -190,7 +192,7 @@ if __name__ == '__main__':
             print("reset ")
             _, _, is_terminate = de.reset()
             continue
-        temp, _, is_terminate, _ = de.step(random.randint(0, 1) == 1)
+        temp, _, is_terminate, _ = de.step(1)
         i += 1
 
         pygame.time.delay(10)
