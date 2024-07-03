@@ -76,7 +76,7 @@ class DragonEnvironment:
         if self.is_dead:
             self.reward = -3
 
-        return self._get_state(), self.reward, self.is_dead
+        return self._get_state(), self.reward, self.is_dead, False
 
     def _reset_param(self):
         self.is_dead = False
@@ -140,7 +140,7 @@ class DragonEnvironment:
         self._reset_param()
         self._data_update_once()
         self._draw_once()
-        return self._get_state(), False
+        return self._get_state(), False, False
 
     def _draw_background(self):
         # white background

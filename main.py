@@ -11,17 +11,17 @@ my_summary = MySummary(use_wandb=not IS_TEST)
 
 
 def epoch_once(d_environment, d_agent, d_buffer, is_test):
-    s, is_terminate = d_environment.reset()
+    s, truncated, is_terminate = d_environment.reset()
     step = 0
     return_value = 0
     action_list = ""
     reward_list = ""
     c = Counter()
-    while not is_terminate:
+    while not is_terminate and not truncated:
         step += 1
         pre_s = s
         action = d_agent.sample_action(pre_s, is_test)
-        s, reward, is_terminate = d_environment.step(action)
+        s, reward, truncated, is_terminate = d_environment.step(action)
         d_buffer.push((pre_s, action, reward, s, is_terminate))
 
         return_value += reward
