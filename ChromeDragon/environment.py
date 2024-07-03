@@ -1,7 +1,6 @@
 import random
 import time
 
-import cv2
 import pygame
 import torch
 from pygame.color import THECOLORS as COLORS
@@ -9,16 +8,10 @@ from pygame.color import THECOLORS as COLORS
 from ChromeDragon.tools import rect_cover
 import numpy as np
 
+from DQN.constants import *
+
 
 class DragonEnvironment:
-    FRAME = 0.02
-    SPEED = 5
-    DRAGON_WIDTH = 30
-    DRAGON_HEIGHT = 50
-    JUMP_V = -300
-    FLOOR_Y = 800
-    G = 9.8 * 30  # g
-    SIZE = [1500, 1000]
 
     def __init__(self):
         self.is_dead, self.is_jump = None, None
@@ -31,15 +24,15 @@ class DragonEnvironment:
         self._game_init()
 
     def _check_dead(self):
-        dragon_rect = (self.dragon_x, self.dragon_y, DragonEnvironment.DRAGON_WIDTH, DragonEnvironment.DRAGON_HEIGHT)
-        if dragon_rect[1] + dragon_rect[3] > 900:
+        dragon_rect = (self.dragon_x, self.dragon_y, DRAGON_WIDTH, DRAGON_HEIGHT)
+        if dragon_rect[1] + dragon_rect[3] > DEAD_BOTTOM:
             return True
         for x in self.cactus_list:
-            down_rect = (x[0], 730, x[1] * 40, 100)
+            down_rect = (x[0], CACTUS_Y, x[1] * CACTUS_WIDTH, CACTUS_HEIGHT)
             if rect_cover(dragon_rect, down_rect, up=False):
                 return True
         for x in self.raven_list:
-            down_rect = (x[0], 800 - x[1] * 50, 100, 20)
+            down_rect = (x[0], RAVEN_BOTTOM - x[1] * RAVEN_Y_BLANK, RAVEN_WIDTH, RAVEN_HEIGHT)
             if rect_cover(dragon_rect, down_rect, up=False):
                 return True
         return False
@@ -47,12 +40,12 @@ class DragonEnvironment:
     def _check_go_through(self):
         reward = 0
         for x in self.cactus_list:
-            if self.dragon_y + DragonEnvironment.DRAGON_HEIGHT < 730 and (
-                    DragonEnvironment.DRAGON_WIDTH // 2 + self.dragon_x) == x[0] + 40 * x[1] // 2:
+            if self.dragon_y + DRAGON_HEIGHT < CACTUS_Y and (
+                    DRAGON_WIDTH // 2 + self.dragon_x) == x[0] + CACTUS_WIDTH * x[1] // 2:
                 reward += 1
         for x in self.raven_list:
-            if self.dragon_y + DragonEnvironment.DRAGON_HEIGHT < 800 - x[1] * 50 and (
-                    DragonEnvironment.DRAGON_WIDTH // 2 + self.dragon_x) == x[0] + 100 // 2:
+            if self.dragon_y + DRAGON_HEIGHT < RAVEN_BOTTOM - x[1] * RAVEN_Y_BLANK and (
+                    DRAGON_WIDTH // 2 + self.dragon_x) == x[0] + RAVEN_WIDTH // 2:
                 reward += 1
                 self.reward = reward
 
@@ -89,11 +82,12 @@ class DragonEnvironment:
         self.is_dead = False
         self.is_jump = False
         self.jump_times = 2
-        self.dragon_x = 200
-        self.dragon_y = 760
+        self.dragon_x = DRAGON_X_INIT
+        self.dragon_y = DRAGON_Y_INIT
         self.dragon_v = 0
-        self.raven_list = [[700, 1], [1700, 2]]
-        self.cactus_list = [[500, 2], [1000, 1], [1500, 1], [2000, 2]]
+        self.raven_list = [[700 // DISTANCE_RATE, 1], [1700 // DISTANCE_RATE, 2]]
+        self.cactus_list = [[500 // DISTANCE_RATE, 2], [1000 // DISTANCE_RATE, 1], [1500 // DISTANCE_RATE, 1],
+                            [2000 // DISTANCE_RATE, 2]]
 
     def _get_state(self):
         raw_state = pygame.surfarray.array3d(pygame.display.get_surface())
@@ -108,37 +102,37 @@ class DragonEnvironment:
 
     def _game_init(self):
         pygame.init()
-        self.screen = pygame.display.set_mode(DragonEnvironment.SIZE)
+        self.screen = pygame.display.set_mode(SIZE)
 
     def _data_update_once(self):
         number_of_go_through = 0
         if not self.is_dead:
             for x in self.cactus_list:
-                if x[0] - DragonEnvironment.SPEED > -200:
-                    cactus_center = x[0] + 40 * x[1] // 2
-                    if 0 >= self.dragon_x + DragonEnvironment.DRAGON_WIDTH // 2 - cactus_center >= - DragonEnvironment.SPEED:
+                if x[0] - SPEED > LEFT_BOUND:
+                    cactus_center = x[0] + CACTUS_WIDTH * x[1] // 2
+                    if 0 >= self.dragon_x + DRAGON_WIDTH // 2 - cactus_center >= - SPEED:
                         number_of_go_through += 1
-                    x[0], x[1] = x[0] - DragonEnvironment.SPEED, x[1]
+                    x[0], x[1] = x[0] - SPEED, x[1]
                 else:
-                    x[0], x[1] = 2200, random.choice([1, 2])
+                    x[0], x[1] = RANDOM_X, random.choice([1, 2])
             for x in self.raven_list:
-                if x[0] - DragonEnvironment.SPEED > -200:
-                    raven_center = x[0] + 100 // 2
-                    if 0 >= self.dragon_x + DragonEnvironment.DRAGON_WIDTH // 2 - raven_center >= - DragonEnvironment.SPEED:
+                if x[0] - SPEED > LEFT_BOUND:
+                    raven_center = x[0] + RAVEN_WIDTH // 2
+                    if 0 >= self.dragon_x + DRAGON_WIDTH // 2 - raven_center >= - SPEED:
                         number_of_go_through += 1
-                    x[0], x[1] = x[0] - DragonEnvironment.SPEED, x[1]
+                    x[0], x[1] = x[0] - SPEED, x[1]
                 else:
-                    x[0], x[1] = 2200, random.choice([1, 2])
+                    x[0], x[1] = RANDOM_X, random.choice([1, 2])
 
             if not self.is_jump:
-                self.dragon_v += DragonEnvironment.G * DragonEnvironment.FRAME
+                self.dragon_v += G * FRAME
             else:
-                self.dragon_v = DragonEnvironment.JUMP_V
+                self.dragon_v = JUMP_V
                 self.is_jump = False
-            self.dragon_y = self.dragon_y + DragonEnvironment.FRAME * self.dragon_v if self.dragon_y + DragonEnvironment.FRAME * self.dragon_v < (
-                    DragonEnvironment.FLOOR_Y - DragonEnvironment.DRAGON_HEIGHT) else (
-                    DragonEnvironment.FLOOR_Y - DragonEnvironment.DRAGON_HEIGHT)
-            if self.dragon_y >= (DragonEnvironment.FLOOR_Y - DragonEnvironment.DRAGON_HEIGHT):
+            self.dragon_y = self.dragon_y + FRAME * self.dragon_v if self.dragon_y + FRAME * self.dragon_v < (
+                    FLOOR_Y - DRAGON_HEIGHT) else (
+                    FLOOR_Y - DRAGON_HEIGHT)
+            if self.dragon_y >= (FLOOR_Y - DRAGON_HEIGHT):
                 self.jump_times = 2
         return number_of_go_through
 
@@ -151,20 +145,23 @@ class DragonEnvironment:
     def _draw_background(self):
         # white background
         self.screen.fill(COLORS['lightblue'])
-        pygame.draw.rect(self.screen, COLORS['black'], (-100, 902, 3000, 200), 5)
-        pygame.draw.rect(self.screen, COLORS['darkgray'], (-100, 802, 3000, 100), 0)
+        black_ = (-100 // DISTANCE_RATE, 902 // DISTANCE_RATE, 3000 // DISTANCE_RATE, 200 // DISTANCE_RATE)
+        darkgray_ = (-100 // DISTANCE_RATE, 802 // DISTANCE_RATE, 3000 // DISTANCE_RATE, 100 // DISTANCE_RATE)
+        pygame.draw.rect(self.screen, COLORS['black'], black_, 5)
+        pygame.draw.rect(self.screen, COLORS['darkgray'], darkgray_, 0)
 
     def _draw_cactus(self):
         for x in self.cactus_list:
-            pygame.draw.rect(self.screen, COLORS['darkgreen'], (x[0], 730, 40 * x[1], 100), 0)
+            pygame.draw.rect(self.screen, COLORS['darkgreen'], (x[0], CACTUS_Y, CACTUS_WIDTH * x[1], CACTUS_HEIGHT), 0)
 
     def _draw_raven(self):
         for x in self.raven_list:
-            pygame.draw.rect(self.screen, COLORS['black'], (x[0], 800 - x[1] * 50, 100, 20), 0)
+            pygame.draw.rect(self.screen, COLORS['black'],
+                             (x[0], RAVEN_BOTTOM - x[1] * RAVEN_Y_BLANK, RAVEN_WIDTH, RAVEN_HEIGHT), 0)
 
     def _draw_dragon(self):
         pygame.draw.rect(self.screen, COLORS['darkred'], (
-            self.dragon_x, self.dragon_y, DragonEnvironment.DRAGON_WIDTH, DragonEnvironment.DRAGON_HEIGHT), 0)
+            self.dragon_x, self.dragon_y, DRAGON_WIDTH, DRAGON_HEIGHT), 0)
 
     def _quit(self):
         pygame.quit()
@@ -199,7 +196,7 @@ if __name__ == '__main__':
             print("reset ")
             _, is_terminate = de.reset()
             continue
-        temp, is_terminate = de.step(False)
+        temp, _, is_terminate = de.step(random.randint(0, 1) == 1)
         i += 1
 
         pygame.time.delay(10)
