@@ -188,15 +188,15 @@ def is_quit():
 if __name__ == '__main__':
     de = DragonEnvironment()
     i = 0
-    temp, is_terminate = de.reset()
+    temp, _, is_terminate = de.reset()
 
     while True:
         if is_quit() or is_terminate:
             time.sleep(10)
             print("reset ")
-            _, is_terminate = de.reset()
+            _, _, is_terminate = de.reset()
             continue
-        temp, _, is_terminate = de.step(random.randint(0, 1) == 1)
+        temp, _, is_terminate, _ = de.step(random.randint(0, 1) == 1)
         i += 1
 
         pygame.time.delay(10)
