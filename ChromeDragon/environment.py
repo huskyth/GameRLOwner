@@ -86,7 +86,7 @@ class DragonEnvironment:
 
     def _get_state(self):
         raw_state = pygame.surfarray.array3d(pygame.display.get_surface())
-        raw_state = cv2.resize(raw_state, (SIZE[0] // 2, SIZE[1] // 2), interpolation=cv2.INTER_AREA)
+        raw_state = cv2.resize(raw_state, (SIZE[0] // 4, SIZE[1] // 4), interpolation=cv2.INTER_AREA)
         raw_state = (raw_state - raw_state.min()) / (raw_state.max() - raw_state.min())
         jump_times = torch.ones((*raw_state.shape[:2], 1)) * self.jump_times
         concatenated_state = np.concatenate((raw_state, jump_times), axis=-1)
