@@ -1,12 +1,10 @@
-import cv2
-
 from ChromeDragon.environment import DragonEnvironment
 from ChromeDragon.tensor_board_tool import MySummary
 from DQN.agent import DragonAgent
 from DQN.buffer import DragonBuffer
+from collections import Counter
 
 EPOCH = 10000
-from collections import Counter
 
 IS_TEST = False
 my_summary = MySummary(use_wandb=not IS_TEST)

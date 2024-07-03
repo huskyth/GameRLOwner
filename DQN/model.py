@@ -1,4 +1,3 @@
-import numpy as np
 import torch.nn as nn
 
 import torch
@@ -46,22 +45,11 @@ class DragonModel(nn.Module):
             nn.Linear(self.const_channel, 2),
             nn.Softmax(),
         )
-        self.rnn_feature = nn.RNN(self.const_channel, self.const_channel, 1, batch_first=True)
 
-    def forward(self, x, hidden=None):
+    def forward(self, x):
         x = self.common_feature(x)
-        x = x.view(BATCH_SIZE, -1, self.const_channel)
-
-        output, hidden = self.rnn_feature(x, hidden)
-        q_sa = self.action_feature(output)
-        return q_sa, hidden.detach()
-
-    @torch.no_grad()
-    def step(self, x, hidden=None):
-        assert x.size(0) == 1
-        x = self.common_feature(x).unsqueeze(1)
-        x, hidden = self.rnn_feature(x, hidden)
-        return self.action_feature(x).squeeze(0), hidden
+        q_sa = self.action_feature(x)
+        return q_sa
 
 
 if __name__ == '__main__':
