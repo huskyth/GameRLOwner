@@ -57,22 +57,16 @@ class DragonEnvironment:
     def step(self, action):
         assert action in [0, 1]
         self.reward = 1
-        number_of_go_through = 0
         if action == 1:
-            assert self.jump_times > 0
             self._jump_data_update()
-
-        if self.jump_times > 0:
+        count = 0
+        while count < STATE_STEPS:
             self._data_update_once()
             self._draw_once()
-            self.is_dead = self._check_dead()
+            count += 1
 
-        while self.jump_times <= 0:
-            self._data_update_once()
-            self._draw_once()
-            self.is_dead = self._check_dead()
-            if self.is_dead is True:
-                break
+        self.is_dead = self._check_dead()
+
         if self.is_dead:
             self.reward = -3
 
