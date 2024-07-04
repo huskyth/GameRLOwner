@@ -106,7 +106,7 @@ class DragonEnvironment:
             for x in self.cactus_list:
                 if x[0] - SPEED > LEFT_BOUND:
                     cactus_center = x[0] + CACTUS_WIDTH * x[1] // 2
-                    if 0 >= self.dragon_x + DRAGON_WIDTH // 2 - cactus_center >= - SPEED:
+                    if 0 > self.dragon_x + DRAGON_WIDTH // 2 - cactus_center >= - SPEED:
                         number_of_go_through += 1
                     x[0], x[1] = x[0] - SPEED, x[1]
                 else:
@@ -114,7 +114,7 @@ class DragonEnvironment:
             for x in self.raven_list:
                 if x[0] - SPEED > LEFT_BOUND:
                     raven_center = x[0] + RAVEN_WIDTH // 2
-                    if 0 >= self.dragon_x + DRAGON_WIDTH // 2 - raven_center >= - SPEED:
+                    if 0 > self.dragon_x + DRAGON_WIDTH // 2 - raven_center >= - SPEED:
                         number_of_go_through += 1
                     x[0], x[1] = x[0] - SPEED, x[1]
                 else:
