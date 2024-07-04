@@ -1,5 +1,6 @@
 import random
 import time
+from collections import deque
 
 import cv2
 import pygame
@@ -11,6 +12,8 @@ import numpy as np
 
 from DQN.constants import *
 
+STATE_LENGTH = 4
+
 
 class DragonEnvironment:
 
@@ -21,6 +24,7 @@ class DragonEnvironment:
         self.raven_list, self.cactus_list = None, None
         self.screen = None
         self.reward = None
+        self.state_sequence = deque(maxlen=STATE_LENGTH)
         self._reset_param()
         self._game_init()
 
@@ -46,14 +50,16 @@ class DragonEnvironment:
     def step(self, action):
         assert isinstance(action, int)
         assert action in [0, 1]
-        self.reward = 1
+        self.reward = 0
         if action == 1:
             self._jump_data_update()
-        count = 0
-        while count < STATE_STEPS:
-            self._data_update_once()
-            self._draw_once()
-            count += 1
+
+        assert len(self.state_sequence) == 4
+        self.reward += self._data_update_once()
+        self._draw_once()
+        state = self._get_single_frame()
+        self.state_sequence.append(state)
+        assert len(self.state_sequence) == 4
 
         self.is_dead = self._check_dead()
         if self.is_dead:
@@ -64,6 +70,7 @@ class DragonEnvironment:
     def _reset_param(self):
         self.is_dead = False
         self.is_jump = False
+        self.state_sequence.clear()
         self.jump_times = 2
         self.dragon_x = DRAGON_X_INIT
         self.dragon_y = DRAGON_Y_INIT
@@ -72,7 +79,7 @@ class DragonEnvironment:
         self.cactus_list = [[500 // DISTANCE_RATE, 2], [1000 // DISTANCE_RATE, 1], [1500 // DISTANCE_RATE, 1],
                             [2000 // DISTANCE_RATE, 2]]
 
-    def _get_state(self):
+    def _get_single_frame(self):
         raw_state = pygame.surfarray.array3d(pygame.display.get_surface())
         raw_state = cv2.resize(raw_state, (SIZE[0] // 4, SIZE[1] // 4), interpolation=cv2.INTER_AREA)
         raw_state = cv2.cvtColor(raw_state, cv2.COLOR_RGB2GRAY)
@@ -117,10 +124,18 @@ class DragonEnvironment:
                 self.jump_times = 2
         return number_of_go_through
 
+    def _get_state(self):
+        return torch.from_numpy(np.concatenate(self.state_sequence, axis=1)).cuda()
+
     def reset(self):
         self._reset_param()
-        self._data_update_once()
-        self._draw_once()
+        assert len(self.state_sequence) == 0
+        while len(self.state_sequence) < STATE_LENGTH:
+            self._data_update_once()
+            self._draw_once()
+            state = self._get_single_frame()
+            self.state_sequence.append(state)
+        assert len(self.state_sequence) == STATE_LENGTH
         return self._get_state(), False, False
 
     def _draw_background(self):
