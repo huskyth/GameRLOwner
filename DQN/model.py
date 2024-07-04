@@ -19,7 +19,7 @@ class DragonModel(nn.Module):
         super().__init__()
         self.const_channel = 64
         self.common_feature = nn.Sequential(
-            nn.Conv2d(1, self.const_channel, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(4, self.const_channel, kernel_size=3, stride=2, padding=1),
             nn.BatchNorm2d(self.const_channel),
             nn.ReLU(),
             nn.Conv2d(self.const_channel, self.const_channel, kernel_size=3, stride=2, padding=1),
