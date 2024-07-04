@@ -19,7 +19,7 @@ class DragonModel(nn.Module):
         super().__init__()
         self.const_channel = 64
         self.common_feature = nn.Sequential(
-            nn.Conv2d(4, self.const_channel, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(1, self.const_channel, kernel_size=3, stride=2, padding=1),
             nn.BatchNorm2d(self.const_channel),
             nn.ReLU(),
             nn.Conv2d(self.const_channel, self.const_channel, kernel_size=3, stride=2, padding=1),
@@ -46,7 +46,7 @@ class DragonModel(nn.Module):
 if __name__ == '__main__':
     print(torch.cuda.is_available())
     dm = DragonModel()
-    image = torch.zeros((1500 // 20, 1000 // 20, 4)).permute(2, 0, 1).unsqueeze(0)
+    image = torch.zeros((1500 // 20, 1000 // 20, 1)).permute(2, 0, 1).unsqueeze(0)
     image_single = image
     image_list = []
     for _ in range(BATCH_SIZE * SEQUENCE_LENGTH):
@@ -55,5 +55,3 @@ if __name__ == '__main__':
     image = torch.cat(image_list, dim=0)
 
     y = dm(image)
-
-    dm.step(image_single)

@@ -74,14 +74,11 @@ class DragonEnvironment:
 
     def _get_state(self):
         raw_state = pygame.surfarray.array3d(pygame.display.get_surface())
-        raw_state = cv2.resize(raw_state, (SIZE[0] // 20, SIZE[1] // 20), interpolation=cv2.INTER_AREA)
-        raw_state = (raw_state - raw_state.min()) / (raw_state.max() - raw_state.min())
-        jump_times = torch.ones((*raw_state.shape[:2], 1)) * self.jump_times
-        concatenated_state = np.concatenate((raw_state, jump_times), axis=-1)
-        state = torch.from_numpy(concatenated_state[None]).float()
+        raw_state = cv2.resize(raw_state, (SIZE[0] // 4, SIZE[1] // 4), interpolation=cv2.INTER_AREA)
+        raw_state = cv2.cvtColor(raw_state, cv2.COLOR_RGB2GRAY)
+        threshold, raw_state = cv2.threshold(raw_state, 127, 255, cv2.THRESH_BINARY)
+        state = torch.from_numpy(raw_state[None, None]).float()
         assert len(state.shape) == 4
-        if state.shape[3] == 4:
-            state = state.permute(0, 3, 1, 2)
         return state
 
     def _game_init(self):
