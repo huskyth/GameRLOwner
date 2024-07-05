@@ -81,9 +81,8 @@ class DragonEnvironment:
 
     def _get_single_frame(self):
         raw_state = pygame.surfarray.array3d(pygame.display.get_surface())
-        raw_state = cv2.resize(raw_state, (SIZE[0] // 4, SIZE[1] // 4), interpolation=cv2.INTER_AREA)
+        raw_state = cv2.resize(raw_state, (SIZE[1] // 4, SIZE[0] // 4), interpolation=cv2.INTER_AREA)
         raw_state = cv2.cvtColor(raw_state, cv2.COLOR_RGB2GRAY)
-        threshold, raw_state = cv2.threshold(raw_state, 127, 255, cv2.THRESH_BINARY)
         state = torch.from_numpy(raw_state[None, None]).float()
         assert len(state.shape) == 4
         return state
@@ -129,10 +128,10 @@ class DragonEnvironment:
 
     def reset(self):
         self._reset_param()
+        self._data_update_once()
+        self._draw_once()
         assert len(self.state_sequence) == 0
         while len(self.state_sequence) < STATE_LENGTH:
-            self._data_update_once()
-            self._draw_once()
             state = self._get_single_frame()
             self.state_sequence.append(state)
         assert len(self.state_sequence) == STATE_LENGTH
@@ -185,7 +184,6 @@ if __name__ == '__main__':
     de = DragonEnvironment()
     i = 0
     temp, _, is_terminate = de.reset()
-
     while True:
         if is_quit() or is_terminate:
             time.sleep(10)
