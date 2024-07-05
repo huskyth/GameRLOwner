@@ -6,7 +6,7 @@ from DQN.constants import BATCH_SIZE
 
 class DragonBuffer:
     def __init__(self):
-        self.buffer = deque(maxlen=100)
+        self.buffer = deque(maxlen=10000)
 
     def sample(self, batch=BATCH_SIZE):
         batch = min(batch, len(self.buffer))
