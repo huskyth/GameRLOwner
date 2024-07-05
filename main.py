@@ -9,8 +9,11 @@ EPOCH = 10000
 IS_TEST = False
 my_summary = MySummary(use_wandb=not IS_TEST)
 
+global_return = None
+
 
 def epoch_once(d_environment, d_agent, d_buffer, is_test):
+    global global_return
     s, truncated, is_terminate = d_environment.reset()
     step = 0
     return_value = 0
@@ -28,9 +31,13 @@ def epoch_once(d_environment, d_agent, d_buffer, is_test):
         action_list += str(action) + ","
         reward_list += str(reward) + ","
         c.update(str(action))
+    if global_return is None:
+        global_return = return_value
     if not is_test:
+        global_return = 0.9 * global_return + 0.1 * return_value
         my_summary.add_float(x=0, y=return_value, title="Return Value")
         my_summary.add_float(x=0, y=step, title="Total Step")
+        my_summary.add_float(x=0, y=global_return, title="Smooth Reward")
         d_agent.update()
         d_agent.save()
         print(f"return value: {return_value}")
@@ -44,7 +51,7 @@ if __name__ == '__main__':
     d_environment_ = DragonEnvironment()
     d_buffer_ = DragonBuffer()
     d_agent_ = DragonAgent(d_buffer_, my_summary)
-    d_agent_.load()
+    # d_agent_.load()
 
     for epo in range(EPOCH):
         epoch_once(d_environment_, d_agent_, d_buffer_, IS_TEST)
