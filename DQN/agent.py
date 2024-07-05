@@ -48,7 +48,7 @@ class DragonAgent:
             -1. * self.sample_count / self.epsilon_decay)
         self.my_summary.add_float(x=0, y=self.epsilon, title="Epsilon")
         if random.uniform(0, 1) < self.epsilon:
-            return self.random_sampler.sample().item()
+            return int(self.random_sampler.sample().item())
         else:
             return self._get_action(state)
 
