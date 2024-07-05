@@ -50,12 +50,12 @@ class DragonEnvironment:
     def step(self, action):
         assert isinstance(action, int)
         assert action in [0, 1]
-        self.reward = 0.01
+        self.reward = 0.0
         if action == 1:
             self._jump_data_update()
 
         assert len(self.state_sequence) == 4
-        self._data_update_once()
+        self.reward += self._data_update_once()
         self._draw_once()
         state = self._get_single_frame()
         self.state_sequence.append(state)
