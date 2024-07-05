@@ -25,7 +25,7 @@ class DragonAgent:
         self.sample_count = 0
         self.epsilon_start = 0.95
         self.epsilon_end = 0.01
-        self.epsilon_decay = 350
+        self.epsilon_decay = 3500
         self.my_summary = my_summary
 
     @torch.no_grad()
@@ -56,7 +56,6 @@ class DragonAgent:
         saved = torch.load("best.pt")
         self.q_net.load_state_dict(saved["model_state_dict"])
         self.optimizer.load_state_dict(saved["optimizer_state_dict"])
-        print(self.q_net.state_dict()['feature.2.weight'][0][0])
 
     def update(self):
         state, action, reward, next_state, done = self.buffer.sample()
@@ -71,7 +70,7 @@ class DragonAgent:
         next_action = torch.argmax(self.q_net(next_state), dim=-1).unsqueeze(1)
         q_target = self.gamma * (1 - done) * self.target_q_net(next_state).gather(1, next_action) + reward
 
-        loss = F.mse_loss(q_target, q_value)
+        loss = F.mse_loss(q_target.detach(), q_value)
 
         self.my_summary.add_float(x=0, y=loss.item(), title="Loss")
         self.optimizer.zero_grad()
