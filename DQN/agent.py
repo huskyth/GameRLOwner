@@ -12,8 +12,6 @@ import torch.nn.functional as F
 class DragonAgent:
     def __init__(self, buffer, my_summary):
         self.q_net = DragonModel().cuda()
-        for key, model in self.q_net.named_parameters():
-            model.data.normal_(-1, 1)
 
         self.target_q_net = DragonModel().cuda()
 

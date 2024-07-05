@@ -14,6 +14,12 @@ class Reshape(nn.Module):
         return x.reshape((x.size(0),) + self.shape)
 
 
+def init_weights(m):
+    if type(m) == nn.Conv2d:
+        torch.nn.init.xavier_uniform_(m.weight)
+        m.bias.data.fill_(0.01)
+
+
 class DragonModel(nn.Module):
     def __init__(self):
         super().__init__()
@@ -36,6 +42,7 @@ class DragonModel(nn.Module):
             nn.Linear(self.const_channel, 2),
             nn.Softmax(),
         )
+        self.common_feature.apply(init_weights)
 
     def forward(self, x):
         x = self.common_feature(x)
