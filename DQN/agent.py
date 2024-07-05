@@ -7,6 +7,7 @@ import torch
 from DQN.buffer import DragonBuffer
 from DQN.model import DragonModel
 import torch.nn.functional as F
+from torch.distributions import Bernoulli
 
 
 class DragonAgent:
@@ -28,6 +29,9 @@ class DragonAgent:
         self.epsilon_decay = 3500
         self.my_summary = my_summary
 
+        self.random_sampler = Bernoulli(0.3)
+
+
     @torch.no_grad()
     def _get_action(self, state):
         state = state.cuda()
@@ -44,7 +48,7 @@ class DragonAgent:
             -1. * self.sample_count / self.epsilon_decay)
         self.my_summary.add_float(x=0, y=self.epsilon, title="Epsilon")
         if random.uniform(0, 1) < self.epsilon:
-            return torch.randint(low=0, high=2, size=(1,)).item()
+            return self.random_sampler.sample().item()
         else:
             return self._get_action(state)
 
@@ -100,3 +104,10 @@ if __name__ == '__main__':
     da.update()
 
     da.load()
+
+    # b = Bernoulli(0.3)
+    # t = [b.sample().item() for i in range(1000)]
+    # from matplotlib import pyplot as plt
+    #
+    # plt.hist(t)
+    # plt.show()
