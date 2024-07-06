@@ -12,7 +12,7 @@ import numpy as np
 
 from DQN.constants import *
 
-STATE_LENGTH = 8
+STATE_LENGTH = 4
 
 
 class DragonEnvironment:
