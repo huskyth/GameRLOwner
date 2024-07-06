@@ -55,12 +55,12 @@ class DragonEnvironment:
         if action == 1:
             self._jump_data_update()
 
-        assert len(self.state_sequence) == 4
+        assert len(self.state_sequence) == STATE_LENGTH
         self.reward += self._data_update_once()
         self._draw_once()
         state = self._get_single_frame()
         self.state_sequence.append(state)
-        assert len(self.state_sequence) == 4
+        assert len(self.state_sequence) == STATE_LENGTH
 
         self.is_dead = self._check_dead()
         if self.is_dead:

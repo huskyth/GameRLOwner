@@ -2,7 +2,7 @@ import torch.nn as nn
 
 import torch
 
-from ChromeDragon.environment import DragonEnvironment
+from ChromeDragon.environment import DragonEnvironment, STATE_LENGTH
 from DQN.constants import SEQUENCE_LENGTH, BATCH_SIZE
 
 
@@ -26,7 +26,7 @@ class DragonModel(nn.Module):
         super().__init__()
         self.const_channel = 64
         self.common_feature = nn.Sequential(
-            nn.Conv2d(9, self.const_channel, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(STATE_LENGTH + 1, self.const_channel, kernel_size=3, stride=2, padding=1),
             nn.BatchNorm2d(self.const_channel),
             nn.ReLU(),
             nn.Conv2d(self.const_channel, self.const_channel, kernel_size=3, stride=2, padding=1),
