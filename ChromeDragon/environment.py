@@ -125,7 +125,7 @@ class DragonEnvironment:
         return number_of_go_through
 
     def _get_state(self):
-        state = torch.from_numpy(np.concatenate(self.state_sequence, axis=1)).clone().detach()
+        state = torch.from_numpy(np.concatenate(self.state_sequence, axis=1)).clone().detach() / 255
         jump_times = (torch.ones(state.size()[2:]) * self.jump_times)[None, None, :]
         state = torch.cat((state, jump_times), dim=1)
         if self.is_cuda:
