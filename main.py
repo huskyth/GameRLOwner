@@ -27,7 +27,7 @@ def epoch_once(d_environment, d_agent, d_buffer, is_test):
     action_list = ""
     reward_list = ""
     c = Counter()
-    p = my_probability(s)
+    p = my_probability(s, d_agent.q_net)
     my_summary.add_float(x=0, y=p[0, 0].item(), title="P0 Value")
     my_summary.add_float(x=0, y=p[0, 1], title="P1 Step")
     while not is_terminate:
