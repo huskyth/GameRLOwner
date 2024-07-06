@@ -24,6 +24,7 @@ class DragonEnvironment:
         self.raven_list, self.cactus_list = None, None
         self.screen = None
         self.reward = None
+        self.is_cuda = False if not torch.cuda.is_available() else True
         self.state_sequence = deque(maxlen=STATE_LENGTH)
         self._reset_param()
         self._game_init()
@@ -124,7 +125,10 @@ class DragonEnvironment:
         return number_of_go_through
 
     def _get_state(self):
-        return torch.from_numpy(np.concatenate(self.state_sequence, axis=1)).cuda()
+        state = torch.from_numpy(np.concatenate(self.state_sequence, axis=1)).clone().detach()
+        if self.is_cuda:
+            state = state.cuda()
+        return state
 
     def reset(self):
         self._reset_param()
@@ -184,13 +188,14 @@ if __name__ == '__main__':
     de = DragonEnvironment()
     i = 0
     temp, _, is_terminate = de.reset()
+    tp = [1] + [0] * 90 + [1]
     while True:
         if is_quit() or is_terminate:
             time.sleep(10)
             print("reset ")
             _, _, is_terminate = de.reset()
             continue
-        temp, _, is_terminate, _ = de.step(1)
+        temp, _, is_terminate, _ = de.step(tp[i % len(tp)])
         i += 1
-
+        print(f"frame {i}")
         pygame.time.delay(10)
