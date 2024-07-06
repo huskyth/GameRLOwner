@@ -29,7 +29,7 @@ class DragonAgent:
         self.sample_count = 0
         self.epsilon_start = 0.95
         self.epsilon_end = 0.01
-        self.epsilon_decay = 3500
+        self.epsilon_decay = 35000
         self.my_summary = my_summary
 
     @torch.no_grad()
