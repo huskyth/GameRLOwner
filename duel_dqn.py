@@ -75,8 +75,8 @@ def init_weights(m):
 
 def train(q, q_target, memory, batch_size, gamma, optimizer, device):
     s, r, a, s_prime, done = list(map(list, zip(*memory.sample(batch_size))))
-    s = np.array(s).squeeze()
-    s_prime = np.array(s_prime).squeeze()
+    s = np.array(s.cpu()).squeeze()
+    s_prime = np.array(s_prime.cpu()).squeeze()
     a_max = q(s_prime).max(1)[1].unsqueeze(-1)
     r = torch.FloatTensor(r).unsqueeze(-1).to(device)
     done = torch.FloatTensor(done).unsqueeze(-1).to(device)
