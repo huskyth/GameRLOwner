@@ -66,7 +66,7 @@ class DragonEnvironment:
         if self.is_dead:
             self.reward = -1
 
-        return self._get_state(), self.reward, self.is_dead, False
+        return self._get_state(), self.reward, self.is_dead
 
     def _reset_param(self):
         self.is_dead = False
@@ -195,7 +195,7 @@ if __name__ == '__main__':
             print("reset ")
             _, _, is_terminate = de.reset()
             continue
-        temp, _, is_terminate, _ = de.step(tp[i % len(tp)])
+        temp, is_terminate, _ = de.step(tp[i % len(tp)])
         i += 1
         print(f"frame {i}")
         pygame.time.delay(10)
