@@ -53,10 +53,10 @@ class DragonModel(nn.Module):
 if __name__ == '__main__':
     print(torch.cuda.is_available())
     dm = DragonModel()
-    image = torch.zeros((1500 // 20, 1000 // 20, 1)).permute(2, 0, 1).unsqueeze(0)
+    image = torch.zeros((1500 // 20, 1000 // 20, 4)).permute(2, 0, 1).unsqueeze(0)
     image_single = image
     image_list = []
-    for _ in range(BATCH_SIZE * SEQUENCE_LENGTH):
+    for _ in range(1 * SEQUENCE_LENGTH):
         image_list.append(image)
 
     image = torch.cat(image_list, dim=0)

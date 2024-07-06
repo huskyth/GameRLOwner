@@ -1,3 +1,5 @@
+import torch
+
 from ChromeDragon.environment import DragonEnvironment
 from ChromeDragon.tensor_board_tool import MySummary
 from DQN.agent import DragonAgent
@@ -12,6 +14,11 @@ my_summary = MySummary(use_wandb=not IS_TEST)
 global_return = None
 
 
+@torch.no_grad()
+def my_probability(state, model):
+    return model(state)
+
+
 def epoch_once(d_environment, d_agent, d_buffer, is_test):
     global global_return
     s, truncated, is_terminate = d_environment.reset()
@@ -20,6 +27,9 @@ def epoch_once(d_environment, d_agent, d_buffer, is_test):
     action_list = ""
     reward_list = ""
     c = Counter()
+    p = my_probability(s)
+    my_summary.add_float(x=0, y=p[0, 0].item(), title="P0 Value")
+    my_summary.add_float(x=0, y=p[0, 1], title="P1 Step")
     while not is_terminate and not truncated:
         step += 1
         pre_s = s
