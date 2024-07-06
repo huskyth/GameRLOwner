@@ -6,7 +6,7 @@ from DQN.agent import DragonAgent
 from DQN.buffer import DragonBuffer
 from collections import Counter
 
-EPOCH = 10000
+EPOCH = 100000000
 
 IS_TEST = False
 my_summary = MySummary(use_wandb=not IS_TEST)

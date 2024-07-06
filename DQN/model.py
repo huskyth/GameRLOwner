@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     print(torch.cuda.is_available())
     d_environment = DragonEnvironment()
-    s, truncated, is_terminate = d_environment.reset()
+    s, is_terminate = d_environment.reset()
 
     dm = DragonModel()
     p0, p1 = [], []

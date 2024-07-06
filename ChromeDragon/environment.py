@@ -126,6 +126,8 @@ class DragonEnvironment:
 
     def _get_state(self):
         state = torch.from_numpy(np.concatenate(self.state_sequence, axis=1)).clone().detach()
+        jump_times = (torch.ones(state.size()[2:]) * self.jump_times)[None, None, :]
+        state = torch.cat((state, jump_times), dim=1)[:, -1, :, :]
         if self.is_cuda:
             state = state.cuda()
         return state
@@ -187,15 +189,23 @@ def is_quit():
 if __name__ == '__main__':
     de = DragonEnvironment()
     i = 0
-    temp, _, is_terminate = de.reset()
-    tp = [1] + [0] * 90 + [1]
+    temp, is_terminate = de.reset()
+    tp = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+          ]
+    print(len(tp))
     while True:
         if is_quit() or is_terminate:
             time.sleep(10)
             print("reset ")
-            _, _, is_terminate = de.reset()
+            _, is_terminate = de.reset()
             continue
-        temp, is_terminate, _ = de.step(tp[i % len(tp)])
+        temp, r, is_terminate = de.step(tp[i % len(tp)])
         i += 1
-        print(f"frame {i}")
+        print(f"frame {i}_ {r}")
         pygame.time.delay(10)

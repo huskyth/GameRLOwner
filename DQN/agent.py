@@ -29,9 +29,6 @@ class DragonAgent:
         self.epsilon_decay = 3500
         self.my_summary = my_summary
 
-        self.random_sampler = Bernoulli(0.3)
-
-
     @torch.no_grad()
     def _get_action(self, state):
         state = state.cuda()
@@ -48,7 +45,7 @@ class DragonAgent:
             -1. * self.sample_count / self.epsilon_decay)
         self.my_summary.add_float(x=0, y=self.epsilon, title="Epsilon")
         if random.uniform(0, 1) < self.epsilon:
-            return int(self.random_sampler.sample().item())
+            return random.randint(0, 1)
         else:
             return self._get_action(state)
 
