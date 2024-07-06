@@ -52,25 +52,25 @@ class DragonModel(nn.Module):
 
 
 if __name__ == '__main__':
-    import matplotlib.pyplot as plt
-
-    print(torch.cuda.is_available())
-    d_environment = DragonEnvironment()
-    s, is_terminate = d_environment.reset()
-
+    # import matplotlib.pyplot as plt
+    #
+    # print(torch.cuda.is_available())
+    # d_environment = DragonEnvironment()
+    # s, is_terminate = d_environment.reset()
+    #
     dm = DragonModel()
-    p0, p1 = [], []
-    for x in range(100):
-        with torch.no_grad():
-            p = dm(s)
-        p0.append(p[0, 0])
-        p1.append(p[0, 1])
-    plt.scatter(range(len(p0)), p0)
-    plt.scatter(range(len(p1)), p1)
-    plt.show()
-
-    assert False
-    image = torch.zeros((1500 // 20, 1000 // 20, 4)).permute(2, 0, 1).unsqueeze(0)
+    # p0, p1 = [], []
+    # for x in range(100):
+    #     with torch.no_grad():
+    #         p = dm(s)
+    #     p0.append(p[0, 0])
+    #     p1.append(p[0, 1])
+    # plt.scatter(range(len(p0)), p0)
+    # plt.scatter(range(len(p1)), p1)
+    # plt.show()
+    #
+    # assert False
+    image = torch.zeros((1500 // 20, 1000 // 20, 5)).permute(2, 0, 1).unsqueeze(0)
     image_single = image
     image_list = []
     for _ in range(1 * SEQUENCE_LENGTH):

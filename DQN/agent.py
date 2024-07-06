@@ -12,9 +12,12 @@ from torch.distributions import Bernoulli
 
 class DragonAgent:
     def __init__(self, buffer, my_summary):
-        self.q_net = DragonModel().cuda()
-
-        self.target_q_net = DragonModel().cuda()
+        self.is_cuda = torch.cuda.is_available()
+        self.q_net = DragonModel()
+        self.target_q_net = DragonModel()
+        if self.is_cuda:
+            self.q_net = self.q_net.cuda()
+            self.target_q_net = self.target_q_net.cuda()
 
         self.target_q_net.load_state_dict(self.q_net.state_dict())
         self.buffer = buffer
@@ -31,7 +34,8 @@ class DragonAgent:
 
     @torch.no_grad()
     def _get_action(self, state):
-        state = state.cuda()
+        if self.is_cuda:
+            state = state.cuda()
         action = self.q_net(state)
         action = torch.argmax(action, dim=-1)
         return action.detach().cpu().item()
@@ -60,11 +64,17 @@ class DragonAgent:
 
     def update(self):
         state, action, reward, next_state, done = self.buffer.sample()
-        state = torch.cat(state).cuda()
-        action = torch.tensor(action, dtype=torch.int64).cuda().unsqueeze(1)
-        reward = torch.tensor(reward, dtype=torch.float32).unsqueeze(1).cuda()
-        next_state = torch.cat(next_state).cuda()
-        done = torch.tensor(done).int().unsqueeze(1).cuda()
+        state = torch.cat(state)
+        action = torch.tensor(action, dtype=torch.int64).unsqueeze(1)
+        reward = torch.tensor(reward, dtype=torch.float32).unsqueeze(1)
+        next_state = torch.cat(next_state)
+        done = torch.tensor(done).int().unsqueeze(1)
+        if self.is_cuda:
+            state = state.cuda()
+            action = action.cuda()
+            reward = reward.cuda()
+            next_state = next_state.cuda()
+            done = done.cuda()
 
         q_value = self.q_net(state).gather(1, action)
 
