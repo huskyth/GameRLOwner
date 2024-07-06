@@ -149,13 +149,12 @@ def main(env, q, q_target, optimizer, device):
                     loss / print_interval
                 )
             )
+            my_summary.add_float(x=0, y=total_score / print_interval, title="Score")
+            my_summary.add_float(x=0, y=loss / print_interval, title="Loss")
             score_lst.append(total_score / print_interval)
             total_score = 0
             loss = 0.0
             pickle.dump(score_lst, open("score.p", "wb"))
-
-            my_summary.add_float(x=0, y=total_score / print_interval, title="Score")
-            my_summary.add_float(x=0, y=loss / print_interval, title="Loss")
 
 
 if __name__ == "__main__":
