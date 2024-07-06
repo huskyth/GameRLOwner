@@ -139,7 +139,7 @@ class DragonEnvironment:
             state = self._get_single_frame()
             self.state_sequence.append(state)
         assert len(self.state_sequence) == STATE_LENGTH
-        return self._get_state(), False, False
+        return self._get_state(), False
 
     def _draw_background(self):
         # white background
