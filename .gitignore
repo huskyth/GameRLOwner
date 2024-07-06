@@ -1,3 +1,5 @@
 .idea
 *.pyc
 *.pt
+*.p
+*.pth

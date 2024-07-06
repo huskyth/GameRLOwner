@@ -66,7 +66,7 @@ class DragonEnvironment:
         if self.is_dead:
             self.reward = -1
 
-        return self._get_state(), self.reward, self.is_dead
+        return self._get_state(), self.reward, self.is_dead, ""
 
     def _reset_param(self):
         self.is_dead = False
