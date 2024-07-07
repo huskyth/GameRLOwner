@@ -40,7 +40,7 @@ class DragonModel(nn.Module):
             nn.ReLU(),
         )
         self.action_feature = nn.Sequential(
-            nn.Linear(self.const_channel, 2),
+            nn.Linear(self.const_channel, 12),
             nn.Softmax(),
         )
         self.common_feature.apply(init_weights)
