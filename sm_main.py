@@ -14,7 +14,7 @@ from collections import Counter
 EPOCH = 100000000
 
 IS_TEST = False
-my_summary = MySummary(use_wandb=False)
+my_summary = MySummary(use_wandb=not IS_TEST)
 
 global_return = None
 IS_RENDER = True
@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     d_buffer_ = DragonBuffer()
     d_agent_ = DragonAgent(d_buffer_, my_summary)
-    # d_agent_.load()
+    d_agent_.load()
 
     for epo in range(EPOCH):
         epoch_once(d_environment_, d_agent_, d_buffer_, IS_TEST)

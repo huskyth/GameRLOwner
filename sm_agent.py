@@ -1,6 +1,8 @@
+import math
 import random
 
 import torch
+from gym_super_mario_bros.actions import COMPLEX_MOVEMENT
 
 from DQN.buffer import DragonBuffer
 from sm_model import DragonModel
@@ -42,11 +44,11 @@ class DragonAgent:
         if is_test:
             return self._get_action(state)
         # epsilon指数衰减
-        # self.epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * math.exp(
-        #     -1. * self.sample_count / self.epsilon_decay)
+        self.epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * math.exp(
+            -1. * self.sample_count / self.epsilon_decay)
         self.my_summary.add_float(x=0, y=self.epsilon, title="Epsilon")
         if random.uniform(0, 1) < self.epsilon:
-            return random.randint(0, 1)
+            return random.randint(0, len(COMPLEX_MOVEMENT) - 1)
         else:
             return self._get_action(state)
 
