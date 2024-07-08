@@ -32,7 +32,7 @@ def train(is_test):
     d_buffer = DragonBuffer()
     d_agent = DragonAgent(d_buffer, my_summary)
     # d_agent_.load()
-    log_rate = 10
+    log_rate = 5
     return_value = 0
     for epo in range(EPOCH):
         is_terminate = False
@@ -57,7 +57,7 @@ def train(is_test):
             print("start training ...")
             d_agent.update()
             d_agent.save()
-        if not is_test and epo + 1 % log_rate == 0:
+        if not is_test and (epo + 1) % log_rate == 0:
             my_summary.add_float(x=0, y=step, title="Total Step")
             my_summary.add_float(x=0, y=return_value / log_rate, title="Smooth Reward")
 
