@@ -39,16 +39,20 @@ class DragonModel(nn.Module):
             nn.Linear(self.const_channel * 11 * 11, self.const_channel),
             nn.ReLU(),
         )
-        self.action_feature = nn.Sequential(
+        self.adv = nn.Sequential(
             nn.Linear(self.const_channel, 12),
-            nn.Softmax(),
+        )
+        self.v = nn.Sequential(
+            nn.Linear(self.const_channel, 1),
         )
         self.common_feature.apply(init_weights)
 
     def forward(self, x):
         x = self.common_feature(x)
-        q_sa = self.action_feature(x)
-        return q_sa
+        adv = self.adv(x)
+        v = self.v(x)
+        q = adv.max(-1)[0][:,None] + adv + v
+        return q
 
 
 if __name__ == '__main__':
@@ -70,10 +74,10 @@ if __name__ == '__main__':
     # plt.show()
     #
     # assert False
-    image = torch.zeros((1500 // 20, 1000 // 20, 5)).permute(2, 0, 1).unsqueeze(0)
-    image_single = image
     image_list = []
     for _ in range(1 * SEQUENCE_LENGTH):
+        image = torch.rand((84, 84, 4)).permute(2, 0, 1).unsqueeze(0)
+
         image_list.append(image)
 
     image = torch.cat(image_list, dim=0)
