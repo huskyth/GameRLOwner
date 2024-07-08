@@ -17,7 +17,7 @@ IS_TEST = False
 my_summary = MySummary(use_wandb=not IS_TEST)
 
 global_return = None
-IS_RENDER = True
+IS_RENDER = False
 
 
 @torch.no_grad()
