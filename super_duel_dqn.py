@@ -1,9 +1,7 @@
 import pickle
 import random
-from collections import deque
 
 import gym_super_mario_bros
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
