@@ -23,7 +23,7 @@ class DragonAgent:
         self.gamma = 0.99
 
         self.optimizer = torch.optim.Adam(self.q_net.parameters(), lr=1e-3)
-        self.epsilon = 0.05
+        self.epsilon = 0.001
         self.count = 0
         self.sample_count = 0
         self.epsilon_start = 0.95
@@ -46,7 +46,6 @@ class DragonAgent:
         # epsilon指数衰减
         # self.epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * math.exp(
         #     -1. * self.sample_count / self.epsilon_decay)
-        self.my_summary.add_float(x=0, y=self.epsilon, title="Epsilon")
         if random.uniform(0, 1) < self.epsilon:
             return random.randint(0, len(COMPLEX_MOVEMENT) - 1)
         else:
@@ -85,7 +84,7 @@ class DragonAgent:
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
-        if self.count % 20 == 0:
+        if self.count % 50 == 0:
             print(f"load from q net {self.count}")
             self.target_q_net.load_state_dict(self.q_net.state_dict())
 
