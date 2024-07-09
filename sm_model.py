@@ -48,7 +48,7 @@ class DragonModel(nn.Module):
         x = self.common_feature(x)
         adv = self.adv(x)
         v = self.v(x)
-        q = adv.max(-1)[0][:, None] + adv + v
+        q = adv.max(-1)[0][:, None] * 1 / adv.shape[-1] + adv + v
         return q
 
 
