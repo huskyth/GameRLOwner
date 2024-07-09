@@ -34,6 +34,7 @@ def train(is_test):
     # d_agent_.load()
     log_rate = 10
     return_value = 0
+    loss = 0
     for epo in range(EPOCH):
         is_terminate = False
         s = d_environment.reset()
@@ -56,11 +57,13 @@ def train(is_test):
 
         if len(d_buffer.buffer) > 2000:
             print("start training ...")
-            d_agent.update()
+            loss += d_agent.update()
             d_agent.save()
         if not is_test and (epo + 1) % log_rate == 0:
             my_summary.add_float(x=0, y=step, title="Total Step")
             my_summary.add_float(x=0, y=return_value / log_rate, title="Smooth Reward")
+            my_summary.add_float(x=0, y=loss / log_rate, title="Smooth Reward")
+            loss = 0
 
             return_value = 0
 

@@ -93,6 +93,8 @@ class DragonAgent:
 
         self.count += 1
 
+        return loss.item()
+
 
 if __name__ == '__main__':
     s1 = torch.rand(1500, 1000, 3).cuda().unsqueeze(0)
