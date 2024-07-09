@@ -32,7 +32,7 @@ def train(is_test):
     d_buffer = DragonBuffer()
     d_agent = DragonAgent(d_buffer, my_summary)
     # d_agent_.load()
-    log_rate = 1
+    log_rate = 10
     return_value = 0
     for epo in range(EPOCH):
         is_terminate = False
