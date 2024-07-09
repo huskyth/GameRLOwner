@@ -39,11 +39,9 @@ def train(is_test):
         is_terminate = False
         s = d_environment.reset()
         s = torch.from_numpy(np.array(s).transpose((2, 0, 1))[None])
-        step = 0
 
         c = Counter()
         while not is_terminate:
-            step += 1
             pre_s = s
             action = d_agent.sample_action(pre_s, is_test)
             s, reward, is_terminate, _ = d_environment.step(action)
@@ -60,9 +58,9 @@ def train(is_test):
             loss += d_agent.update()
             d_agent.save()
         if not is_test and (epo + 1) % log_rate == 0:
-            my_summary.add_float(x=0, y=step, title="Total Step")
             my_summary.add_float(x=0, y=return_value / log_rate, title="Mean Reward")
             my_summary.add_float(x=0, y=loss / log_rate, title="Loss")
+            print(f"epoch {epo} loss: {loss / log_rate}, mean reward: {return_value / log_rate}")
             loss = 0
 
             return_value = 0
