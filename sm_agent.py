@@ -79,7 +79,7 @@ class DragonAgent:
         next_action = torch.argmax(self.q_net(next_state), dim=-1).unsqueeze(1)
         q_target = self.gamma * (1 - done) * self.target_q_net(next_state).gather(1, next_action) + reward
 
-        loss = F.mse_loss(q_target.detach(), q_value)
+        loss = F.smooth_l1_loss(q_target.detach(), q_value)
 
         self.optimizer.zero_grad()
         loss.backward()
