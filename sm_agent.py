@@ -85,7 +85,6 @@ class DragonAgent:
         loss.backward()
         self.optimizer.step()
         if self.count % 50 == 0:
-            print(f"load from q net {self.count}")
             self.target_q_net.load_state_dict(self.q_net.state_dict())
 
         self.count += 1
