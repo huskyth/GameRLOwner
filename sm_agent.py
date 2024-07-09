@@ -82,11 +82,9 @@ class DragonAgent:
 
         loss = F.mse_loss(q_target.detach(), q_value)
 
-        self.my_summary.add_float(x=0, y=loss.item(), title="Loss")
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
-        print(f"current update step {self.count}, loss = {loss}")
         if self.count % 20 == 0:
             print(f"load from q net {self.count}")
             self.target_q_net.load_state_dict(self.q_net.state_dict())

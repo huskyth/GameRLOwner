@@ -61,8 +61,8 @@ def train(is_test):
             d_agent.save()
         if not is_test and (epo + 1) % log_rate == 0:
             my_summary.add_float(x=0, y=step, title="Total Step")
-            my_summary.add_float(x=0, y=return_value / log_rate, title="Smooth Reward")
-            my_summary.add_float(x=0, y=loss / log_rate, title="Smooth Reward")
+            my_summary.add_float(x=0, y=return_value / log_rate, title="Mean Reward")
+            my_summary.add_float(x=0, y=loss / log_rate, title="Loss")
             loss = 0
 
             return_value = 0
