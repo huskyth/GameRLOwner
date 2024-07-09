@@ -47,8 +47,9 @@ def train(is_test):
             action = d_agent.sample_action(pre_s, is_test)
             s, reward, is_terminate, _ = d_environment.step(action)
             s = torch.from_numpy(np.array(s).transpose((2, 0, 1))[None])
-            d_buffer.push((pre_s, action, reward, s, is_terminate))
             return_value += reward
+            reward = np.sign(reward) * (np.sqrt(abs(reward) + 1) - 1) + 0.001 * reward
+            d_buffer.push((pre_s, action, reward, s, is_terminate))
             c.update(str(action))
             if IS_RENDER:
                 env.render()
