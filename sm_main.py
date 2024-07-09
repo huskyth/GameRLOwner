@@ -54,7 +54,6 @@ def train(is_test):
                 env.render()
 
         if len(d_buffer.buffer) > 2000:
-            print("start training ...")
             loss += d_agent.update()
             d_agent.save()
         if not is_test and (epo + 1) % log_rate == 0:
@@ -62,7 +61,6 @@ def train(is_test):
             my_summary.add_float(x=0, y=loss / log_rate, title="Loss")
             print(f"epoch {epo} loss: {loss / log_rate}, mean reward: {return_value / log_rate}")
             loss = 0
-
             return_value = 0
 
 
