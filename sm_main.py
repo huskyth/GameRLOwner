@@ -5,7 +5,7 @@ from nes_py.wrappers import JoypadSpace
 from wrappers import wrap_mario
 
 import torch
-
+import numpy as np
 from ChromeDragon.tensor_board_tool import MySummary
 from sm_agent import DragonAgent
 from DQN.buffer import DragonBuffer
@@ -32,12 +32,12 @@ def train(is_test):
     d_buffer = DragonBuffer()
     d_agent = DragonAgent(d_buffer, my_summary)
     # d_agent_.load()
-    log_rate = 5
+    log_rate = 1
     return_value = 0
     for epo in range(EPOCH):
         is_terminate = False
         s = d_environment.reset()
-        s = torch.tensor(s).permute((2, 0, 1))[None]
+        s = torch.from_numpy(np.array(s).transpose((2, 0, 1))[None])
         step = 0
 
         c = Counter()
@@ -46,7 +46,7 @@ def train(is_test):
             pre_s = s
             action = d_agent.sample_action(pre_s, is_test)
             s, reward, is_terminate, _ = d_environment.step(action)
-            s = torch.tensor(s).permute((2, 0, 1))[None]
+            s = torch.from_numpy(np.array(s).transpose((2, 0, 1))[None])
             d_buffer.push((pre_s, action, reward, s, is_terminate))
             return_value += reward
             c.update(str(action))
