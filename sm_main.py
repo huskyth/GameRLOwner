@@ -9,7 +9,6 @@ import numpy as np
 from ChromeDragon.tensor_board_tool import MySummary
 from sm_agent import DragonAgent
 from DQN.buffer import DragonBuffer
-from collections import Counter
 
 EPOCH = 100000000
 
@@ -51,9 +50,9 @@ def train(is_test):
             if IS_RENDER:
                 env.render()
 
-            if len(d_buffer.buffer) > 2000:
-                loss += d_agent.update()
-                d_agent.save()
+        if len(d_buffer.buffer) > 2000:
+            loss += d_agent.update()
+            d_agent.save()
         if not is_test and (epo + 1) % log_rate == 0:
             my_summary.add_float(x=0, y=return_value / log_rate, title="Mean Reward")
             my_summary.add_float(x=0, y=loss / log_rate, title="Loss")
