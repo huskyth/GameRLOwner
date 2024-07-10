@@ -89,7 +89,7 @@ class DragonAgent:
 
         self.count += 1
 
-        return loss.item()
+        return loss
 
 
 if __name__ == '__main__':
