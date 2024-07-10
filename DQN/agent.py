@@ -85,12 +85,12 @@ class DragonAgent:
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
-        print(f"current update step {self.count}, loss = {loss}")
-        if self.count % 20 == 0:
-            print(f"load from q net {self.count}")
+        if self.count % 100 == 0:
             self.target_q_net.load_state_dict(self.q_net.state_dict())
 
         self.count += 1
+
+        return loss.item()
 
 
 if __name__ == '__main__':

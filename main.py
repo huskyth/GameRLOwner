@@ -6,6 +6,8 @@ from DQN.agent import DragonAgent
 from DQN.buffer import DragonBuffer
 from collections import Counter
 
+import gc
+
 EPOCH = 100000000
 
 IS_TEST = False
@@ -21,7 +23,7 @@ def main(is_test):
     d_environment = DragonEnvironment()
     d_buffer = DragonBuffer()
     d_agent = DragonAgent(d_buffer, my_summary)
-    # d_agent_.load()
+    # d_agent.load()
     mean_return = 0
     loss = 0
     log_rate = 10
@@ -37,10 +39,12 @@ def main(is_test):
             if len(d_buffer.buffer) > 2000:
                 loss += d_agent.update()
                 d_agent.save()
+                gc.collect()
 
         if not is_test and (epo + 1) % log_rate == 0:
             my_summary.add_float(x=0, y=mean_return / log_rate, title="Smooth Return")
             my_summary.add_float(x=0, y=loss / log_rate, title="Smooth Loss")
+            print(f"epoch {epo}, loss {loss / log_rate} return  {mean_return / log_rate}")
             mean_return = 0
             loss = 0
 

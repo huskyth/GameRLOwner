@@ -12,7 +12,7 @@ import numpy as np
 
 from DQN.constants import *
 
-STATE_LENGTH = 4
+STATE_LENGTH = 8
 
 
 class DragonEnvironment:
@@ -56,7 +56,7 @@ class DragonEnvironment:
             self._jump_data_update()
 
         assert len(self.state_sequence) == STATE_LENGTH
-        self._data_update_once()
+        self.reward += self._data_update_once()
         self._draw_once()
         state = self._get_single_frame()
         self.state_sequence.append(state)
@@ -64,9 +64,9 @@ class DragonEnvironment:
 
         self.is_dead = self._check_dead()
         if self.is_dead:
-            self.reward = -1
+            self.reward = -3
 
-        return self._get_state(), self.reward, self.is_dead, ""
+        return self._get_state(), self.reward, self.is_dead
 
     def _reset_param(self):
         self.is_dead = False
