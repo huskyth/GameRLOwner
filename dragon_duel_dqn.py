@@ -126,7 +126,7 @@ def main(env, q, q_target, optimizer, device):
                     a = np.argmax(q(s).detach().numpy())
                 else:
                     a = np.argmax(q(s).cpu().detach().numpy())
-            s_prime, r, done, _ = env.step(int(a))
+            s_prime, r, done = env.step(int(a))
             total_score += r
             r = np.sign(r) * (np.sqrt(abs(r) + 1) - 1) + 0.001 * r
             memory.push((s, float(r), int(a), s_prime, int(1 - done)))
