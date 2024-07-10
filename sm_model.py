@@ -36,19 +36,14 @@ class DragonModel(nn.Module):
             nn.Linear(self.const_channel * 11 * 11, self.const_channel),
             nn.ReLU(),
         )
-        self.adv = nn.Sequential(
+        self.q = nn.Sequential(
             nn.Linear(self.const_channel, 12),
-        )
-        self.v = nn.Sequential(
-            nn.Linear(self.const_channel, 1),
         )
         self.common_feature.apply(init_weights)
 
     def forward(self, x):
         x = self.common_feature(x)
-        adv = self.adv(x)
-        v = self.v(x)
-        q = -adv.max(-1)[0][:, None] * 1 / adv.shape[-1] + adv + v
+        q = self.q(x)
         return q
 
 
