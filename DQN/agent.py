@@ -24,7 +24,7 @@ class DragonAgent:
         self.gamma = 0.99
 
         self.optimizer = torch.optim.Adam(self.q_net.parameters(), lr=1e-2)
-        self.epsilon = 0.35
+        self.epsilon = 0.001
         self.count = 0
         self.sample_count = 0
         self.epsilon_start = 0.95
@@ -45,8 +45,6 @@ class DragonAgent:
         if is_test:
             return self._get_action(state)
         # epsilon指数衰减
-        # self.epsilon = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * math.exp(
-        #     -1. * self.sample_count / self.epsilon_decay)
         self.my_summary.add_float(x=0, y=self.epsilon, title="Epsilon")
         if random.uniform(0, 1) < self.epsilon:
             return random.randint(0, 1)
