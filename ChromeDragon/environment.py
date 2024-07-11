@@ -64,7 +64,7 @@ class DragonEnvironment:
 
         self.is_dead = self._check_dead()
         if self.is_dead:
-            self.reward = -10
+            self.reward = -1000
 
         return self._get_state(), self.reward, self.is_dead
 
