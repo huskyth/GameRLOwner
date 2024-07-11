@@ -13,7 +13,7 @@ from wrappers import wrap_mario
 
 
 def handle(state):
-    state = np.array(state) * 255.0
+    state = np.array(state.cpu()) * 255.0
     return state
 
 
@@ -77,25 +77,26 @@ def super_query():
 
 
 def dragon_query():
+    DRAGON_MOVEMENT = {
+        0: "NOOP", 1: "JUMP"
+    }
     env = DragonEnvironment()
     done = True
-    state = env.reset()
+    state, _ = env.reset()
+    state = state[0].permute((1, 2, 0)).permute((1, 0, 2))
     pre_state = state
     write(state=state, step=0, action=None, state_prime=state, reward=None, info=None)
     for i in range(1, 5000):
         action = random.randint(0, 1)
-        state, reward, done, info = env.step(action)
+        state, reward, done = env.step(action)
+        state = state[0].permute((1, 2, 0)).permute((1, 0, 2))
         time.sleep(0.01)
-        write(state=pre_state, step=i, action=f"{action}, {SIMPLE_MOVEMENT[action]}", state_prime=state, reward=reward,
-              info=info)
+        write(state=pre_state, step=i, action=f"{action}, {DRAGON_MOVEMENT[action]}", state_prime=state, reward=reward,
+              info=None)
         pre_state = state
-        env.render()
         if i == 16:
             break
-
     time.sleep(1)
-
-    env.close()
 
 
 if __name__ == '__main__':
