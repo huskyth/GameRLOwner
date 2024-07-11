@@ -56,7 +56,6 @@ def super_query():
     env = gym_super_mario_bros.make('SuperMarioBros-v0')
     env = JoypadSpace(env, SIMPLE_MOVEMENT)
     env = wrap_mario(env)
-    done = True
     state = env.reset()
     pre_state = state
     write(state=state, step=0, action=None, state_prime=state, reward=None, info=None)
@@ -81,12 +80,13 @@ def dragon_query():
         0: "NOOP", 1: "JUMP"
     }
     env = DragonEnvironment()
-    done = True
+    done = False
     state, _ = env.reset()
     state = state[0].permute((1, 2, 0)).permute((1, 0, 2))
     pre_state = state
     write(state=state, step=0, action=None, state_prime=state, reward=None, info=None)
-    for i in range(1, 5000):
+    i = 1
+    while not done:
         action = random.randint(0, 1)
         state, reward, done = env.step(action)
         state = state[0].permute((1, 2, 0)).permute((1, 0, 2))
@@ -94,8 +94,7 @@ def dragon_query():
         write(state=pre_state, step=i, action=f"{action}, {DRAGON_MOVEMENT[action]}", state_prime=state, reward=reward,
               info=None)
         pre_state = state
-        if i == 16:
-            break
+        i += 1
     time.sleep(1)
 
 
