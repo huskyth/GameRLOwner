@@ -8,6 +8,7 @@ import gym_super_mario_bros
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
 import cv2
 
+from ChromeDragon.environment import DragonEnvironment
 from wrappers import wrap_mario
 
 
@@ -50,25 +51,52 @@ def write(state, step, action, state_prime, reward, info):
         f.write(f"info is {info}")
 
 
-# TODO://gym==0.23.0
-env = gym_super_mario_bros.make('SuperMarioBros-v0')
-env = JoypadSpace(env, SIMPLE_MOVEMENT)
-env = wrap_mario(env)
-done = True
-state = env.reset()
-pre_state = state
-write(state=state, step=0, action=None, state_prime=state, reward=None, info=None)
-for i in range(1, 5000):
-    action = random.randint(0, len(SIMPLE_MOVEMENT) - 1)
-    state, reward, done, info = env.step(action)
-    time.sleep(0.01)
-    write(state=pre_state, step=i, action=f"{action}, {SIMPLE_MOVEMENT[action]}", state_prime=state, reward=reward,
-          info=info)
+def super_query():
+    # TODO://gym==0.23.0
+    env = gym_super_mario_bros.make('SuperMarioBros-v0')
+    env = JoypadSpace(env, SIMPLE_MOVEMENT)
+    env = wrap_mario(env)
+    done = True
+    state = env.reset()
     pre_state = state
-    env.render()
-    if i == 8:
-        break
+    write(state=state, step=0, action=None, state_prime=state, reward=None, info=None)
+    for i in range(1, 5000):
+        action = random.randint(0, len(SIMPLE_MOVEMENT) - 1)
+        state, reward, done, info = env.step(4)
+        time.sleep(0.01)
+        write(state=pre_state, step=i, action=f"{action}, {SIMPLE_MOVEMENT[action]}", state_prime=state, reward=reward,
+              info=info)
+        pre_state = state
+        env.render()
+        if i == 16:
+            break
 
-time.sleep(1)
+    time.sleep(1)
 
-env.close()
+    env.close()
+
+
+def dragon_query():
+    env = DragonEnvironment()
+    done = True
+    state = env.reset()
+    pre_state = state
+    write(state=state, step=0, action=None, state_prime=state, reward=None, info=None)
+    for i in range(1, 5000):
+        action = random.randint(0, 1)
+        state, reward, done, info = env.step(action)
+        time.sleep(0.01)
+        write(state=pre_state, step=i, action=f"{action}, {SIMPLE_MOVEMENT[action]}", state_prime=state, reward=reward,
+              info=info)
+        pre_state = state
+        env.render()
+        if i == 16:
+            break
+
+    time.sleep(1)
+
+    env.close()
+
+
+if __name__ == '__main__':
+    dragon_query()
