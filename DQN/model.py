@@ -27,13 +27,10 @@ class DragonModel(nn.Module):
         self.const_channel = 64
         self.common_feature = nn.Sequential(
             nn.Conv2d(STATE_LENGTH + 1, self.const_channel, kernel_size=3, stride=2, padding=1),
-            nn.BatchNorm2d(self.const_channel),
             nn.ReLU(),
             nn.Conv2d(self.const_channel, self.const_channel, kernel_size=3, stride=2, padding=1),
-            nn.BatchNorm2d(self.const_channel),
             nn.ReLU(),
             nn.Conv2d(self.const_channel, self.const_channel, kernel_size=3, stride=2, padding=1),
-            nn.BatchNorm2d(self.const_channel),
             nn.ReLU(),
             Reshape(self.const_channel * 70),
             nn.Linear(self.const_channel * 70, self.const_channel),
