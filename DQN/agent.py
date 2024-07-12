@@ -23,7 +23,7 @@ class DragonAgent:
         self.buffer = buffer
         self.gamma = 0.99
 
-        self.optimizer = torch.optim.Adam(self.q_net.parameters(), lr=1e-3)
+        self.optimizer = torch.optim.Adam(self.q_net.parameters(), lr=1e-4)
         self.epsilon = 0.001
         self.count = 0
         self.sample_count = 0
