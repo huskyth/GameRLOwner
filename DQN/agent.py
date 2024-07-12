@@ -45,7 +45,6 @@ class DragonAgent:
         if is_test:
             return self._get_action(state)
         # epsilon指数衰减
-        self.my_summary.add_float(x=0, y=self.epsilon, title="Epsilon")
         if random.uniform(0, 1) < self.epsilon:
             return random.randint(0, 1)
         else:
