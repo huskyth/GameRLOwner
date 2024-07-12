@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 
 from ChromeDragon.environment import DragonEnvironment
@@ -33,8 +34,9 @@ def main(is_test):
             pre_s = s
             action = d_agent.sample_action(pre_s, is_test)
             s, reward, is_terminate = d_environment.step(action)
-            d_buffer.push((pre_s, action, reward, s, is_terminate))
             mean_return += reward
+            reward = np.sign(reward) * (np.sqrt(abs(reward) + 1) - 1) + 0.001 * reward
+            d_buffer.push((pre_s, action, reward, s, is_terminate))
 
             if len(d_buffer.buffer) > 2000:
                 loss += d_agent.update()
