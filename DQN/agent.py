@@ -76,15 +76,17 @@ class DragonAgent:
         q_value = self.q_net(state).gather(1, action)
 
         next_action = torch.argmax(self.q_net(next_state), dim=-1).unsqueeze(1)
-        q_target = self.gamma * (1 - done) * self.target_q_net(next_state).gather(1, next_action) + reward
+        with torch.no_grad():
+            q_target = self.gamma * (1 - done) * self.target_q_net(next_state).gather(1, next_action) + reward
 
-        loss = F.smooth_l1_loss(q_target.detach(), q_value)
+        loss = F.smooth_l1_loss(q_target, q_value)
 
         self.optimizer.zero_grad()
         loss.backward()
         self.optimizer.step()
         if self.count % 50 == 0:
             self.target_q_net.load_state_dict(self.q_net.state_dict())
+            self.save()
 
         self.count += 1
 

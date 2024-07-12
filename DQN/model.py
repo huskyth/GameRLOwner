@@ -26,20 +26,18 @@ class DragonModel(nn.Module):
         super().__init__()
         self.const_channel = 64
         self.common_feature = nn.Sequential(
-            nn.Conv2d(STATE_LENGTH + 1, self.const_channel, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(STATE_LENGTH + 1, 32, kernel_size=8, stride=4),
             nn.ReLU(),
-            nn.Conv2d(self.const_channel, self.const_channel, kernel_size=3, stride=2, padding=1),
+            nn.Conv2d(32, self.const_channel, kernel_size=3, stride=1),
             nn.ReLU(),
-            nn.Conv2d(self.const_channel, self.const_channel, kernel_size=3, stride=2, padding=1),
-            nn.ReLU(),
-            Reshape(self.const_channel * 70),
-            nn.Linear(self.const_channel * 70, self.const_channel),
+            Reshape(self.const_channel * 15 * 9),
+            nn.Linear(self.const_channel * 15 * 9, 512),
             nn.ReLU(),
         )
         self.adv = nn.Sequential(
-            nn.Linear(self.const_channel, 2),
+            nn.Linear(512, 2),
         )
-        self.v = nn.Linear(self.const_channel, 1)
+        self.v = nn.Linear(512, 1)
         self.common_feature.apply(init_weights)
 
     def forward(self, x):

@@ -40,7 +40,6 @@ def main(is_test):
 
             if len(d_buffer.buffer) > 2000:
                 loss += d_agent.update()
-                d_agent.save()
                 gc.collect()
 
         if not is_test and (epo + 1) % log_rate == 0:
