@@ -19,7 +19,6 @@ def png2rgb():
     img.save('cat.jpg')
 
 
-# 提取某一层网络特征图
 class FeatureExtractor(nn.Module):
     def __init__(self, submodule, extracted_layers):
         super(FeatureExtractor, self).__init__()
@@ -35,7 +34,6 @@ class FeatureExtractor(nn.Module):
             print(name)
             if (self.extracted_layers is None) or (name in self.extracted_layers and 'fc' not in name):
                 outputs[name] = x
-        # print(outputs)
         return outputs
 
 
@@ -54,7 +52,6 @@ def make_dirs(path):
 pic_dir = 'cat.jpg'
 transform = transforms.ToTensor()
 img = get_picture(pic_dir, transform)
-# 插入维度
 img = img.unsqueeze(0)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -67,16 +64,13 @@ therd_size = 256
 
 myexactor = FeatureExtractor(submodule=net, extracted_layers=None)
 output = myexactor(img)
-# output是dict
-# dict_keys(['conv1', 'bn1', 'relu', 'maxpool', 'layer1', 'layer2', 'layer3', 'layer4', 'avgpool', 'fc'])
 
 for idx, val in enumerate(output.items()):
     k, v = val
     features = v[0]
     iter_range = features.shape[0]
     for i in range(iter_range):
-        # plt.imshow(features.data.cpu().numpy()[i,:,:],cmap='jet')
-        if 'fc' in k:  # 不可视化fc层
+        if 'fc' in k:
             continue
 
         feature = features.data.cpu().numpy()
