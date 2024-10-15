@@ -9,7 +9,7 @@ from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
 import cv2
 
 from ChromeDragon.environment import DragonEnvironment
-from wrappers import wrap_mario
+from SuperMaria.wrappers import wrap_mario
 
 
 def handle(state):
