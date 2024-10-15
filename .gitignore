@@ -5,3 +5,7 @@
 *.pth
 *.png
 *.txt
+
+feautures
+
+.DS_Store
